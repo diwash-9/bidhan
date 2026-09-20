@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/constitution"
 
     # Auth
-    jwt_secret: str = "change-me-in-production"
+    jwt_secret: str = "dev-only-change-me-in-production-super-secret-key-0123456789abcdef"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 14

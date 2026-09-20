@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -43,6 +44,15 @@ class Article(Base):
     difficulty_score: Mapped[int] = mapped_column(Integer, default=1)
     estimated_xp: Mapped[int] = mapped_column(Integer, default=15)
 
+    # Edges where this article is the prerequisite (things it unlocks).
+    dependencies: Mapped[list["ArticleDependency"]] = relationship(
+        "ArticleDependency", foreign_keys="ArticleDependency.source_id", back_populates="source_article"
+    )
+    # Edges where this article is the unlock target.
+    unlocks: Mapped[list["ArticleDependency"]] = relationship(
+        "ArticleDependency", foreign_keys="ArticleDependency.target_id", back_populates="target_article"
+    )
+
 
 class Clause(Base):
     __tablename__ = "clauses"
@@ -74,6 +84,14 @@ class ArticleDependency(Base):
     source_id: Mapped[str] = mapped_column(ForeignKey("articles.id"), index=True)
     target_id: Mapped[str] = mapped_column(ForeignKey("articles.id"), index=True)
     relation_type: Mapped[str] = mapped_column(String(20), default="text_reference")  # sequential | cross_part | text_reference
+
+    # source_id is the prerequisite, target_id what it unlocks.
+    source_article: Mapped["Article"] = relationship(
+        "Article", foreign_keys=[source_id], back_populates="dependencies"
+    )
+    target_article: Mapped["Article"] = relationship(
+        "Article", foreign_keys=[target_id], back_populates="unlocks"
+    )
 
 
 class QuizQuestion(Base):
@@ -116,5 +134,25 @@ class QuizAttempt(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     question_id: Mapped[int] = mapped_column(ForeignKey("quiz_questions.id"), index=True)
     selected_option: Mapped[str] = mapped_column(String(1))
-    is_correct: Mapped[bool] = mapped_column(Integer)
+    is_correct: Mapped[bool] = mapped_column(Boolean, default=False)
     answered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+
+class Hearts(Base):
+    __tablename__ = "hearts"
+
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    hearts_left: Mapped[int] = mapped_column(Integer, default=5)
+    max_hearts: Mapped[int] = mapped_column(Integer, default=5)
+    last_refill_ts: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class League(Base):
+    __tablename__ = "leagues"
+    __table_args__ = (UniqueConstraint("week_start", "user_id", name="uq_league_week_user"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    week_start: Mapped[str] = mapped_column(String(10))  # "YYYY-MM-DD" (Monday)
+    xp_earned: Mapped[int] = mapped_column(Integer, default=0)
+    rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
