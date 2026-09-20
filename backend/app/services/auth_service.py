@@ -13,6 +13,7 @@ from app.core.security import (
 )
 from app.db.models import Hearts, User
 from app.schemas import TokenPair, UserRegister
+from app.services.gamif_service import MAX_HEARTS
 
 
 def register(db: Session, payload: UserRegister) -> TokenPair:
@@ -28,7 +29,7 @@ def register(db: Session, payload: UserRegister) -> TokenPair:
     )
     db.add(user)
     db.flush()
-    db.add(Hearts(user_id=user.id, hearts_left=5, max_hearts=5))
+    db.add(Hearts(user_id=user.id, hearts_left=MAX_HEARTS, max_hearts=MAX_HEARTS))
     db.commit()
     return TokenPair(
         access_token=create_access_token(user.id),

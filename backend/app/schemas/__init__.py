@@ -30,6 +30,7 @@ class UserOut(BaseModel):
     id: str
     email: EmailStr
     display_name: str
+    role: str = "user"
     created_at: datetime
     current_streak: int
     longest_streak: int
@@ -131,7 +132,15 @@ class UserProgressOut(BaseModel):
     total_xp: int
     last_active_date: str | None
     hearts_left: int
+    max_hearts: int
+    hearts_refill_at: str | None
     articles: list[ArticleProgressOut]
+
+
+class HeartsState(BaseModel):
+    hearts_left: int
+    max_hearts: int
+    refill_at: str | None
 
 
 class CompleteResult(BaseModel):
@@ -146,3 +155,79 @@ class LeaderboardEntry(BaseModel):
     display_name: str
     total_xp: int
     current_streak: int
+
+
+# --- Admin ---
+
+
+class SubClauseWrite(BaseModel):
+    identifier: str = Field(pattern=r"^[a-z0-9]+$", max_length=10)
+    content: str
+
+
+class ClauseWrite(BaseModel):
+    clause_number: int = Field(ge=1)
+    content: str
+    sub_clauses: list[SubClauseWrite] = []
+
+
+class DependencyWrite(BaseModel):
+    target_id: str
+    relation_type: str = "text_reference"
+
+
+class AdminQuizQuestionWrite(BaseModel):
+    id: int | None = None
+    question_text: str
+    option_a: str
+    option_b: str
+    option_c: str
+    option_d: str
+    correct_option: str = Field(pattern=r"^[A-D]$")
+    explanation: str | None = None
+    difficulty: int = Field(default=1, ge=1, le=5)
+    knowledge_type: str = "article_subject"
+    active: bool = True
+
+
+class AdminArticleWrite(BaseModel):
+    article_number: int = Field(ge=1)
+    title: str
+    part_number: int = Field(ge=1)
+    part_title: str
+    difficulty_score: int = Field(default=1, ge=1, le=10)
+    estimated_xp: int = Field(default=15, ge=0)
+
+
+class AmendRequest(BaseModel):
+    """Full article state + amendment metadata, applied atomically."""
+
+    article: AdminArticleWrite
+    clauses: list[ClauseWrite] = []
+    dependencies: list[DependencyWrite] = []
+    quiz: list[AdminQuizQuestionWrite] = []
+    revision: "RevisionMeta | None" = None
+
+
+class RevisionMeta(BaseModel):
+    amendment_date: str | None = None
+    amendment_act: str | None = None
+    summary: str | None = None
+
+
+class RevisionOut(BaseModel):
+    id: int
+    article_id: str
+    changed_by: str
+    amendment_date: str | None
+    amendment_act: str | None
+    summary: str | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class AmendResult(BaseModel):
+    status: str
+    article_id: str
+    revision_id: int | None

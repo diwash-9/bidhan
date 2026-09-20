@@ -1,5 +1,6 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -15,7 +16,13 @@ from app.db.models import (
 XP_PER_ARTICLE = 15
 XP_PER_QUESTION = 5
 HEART_REFILL_INTERVAL = timedelta(minutes=30)
-MAX_HEARTS = 5
+MAX_HEARTS = 10
+
+
+def utcnow() -> datetime:
+    """Timezone-aware UTC now. The timestamptz column returns aware values, so
+    comparisons must always use aware datetimes to avoid naive/aware errors."""
+    return datetime.now(timezone.utc)
 
 
 def ensure_progress_rows(db: Session, user_id: str) -> None:
@@ -61,16 +68,59 @@ def get_hearts(db: Session, user_id: str) -> Hearts:
 
 
 def _refill(db: Session, hearts: Hearts) -> None:
+    """Grow hearts over time when below the cap (1 heart per interval).
+
+    A heart is earned when `HEART_REFILL_INTERVAL` has elapsed since the last
+    refill tick. Fractions carry forward so partial progress is never lost.
+    """
     if hearts.hearts_left >= hearts.max_hearts:
+        hearts.last_refill_ts = None
         return
     if not hearts.last_refill_ts:
         return
-    elapsed = datetime.now() - hearts.last_refill_ts
+    elapsed = utcnow() - hearts.last_refill_ts
     if elapsed >= HEART_REFILL_INTERVAL:
-        gained = min(hearts.max_hearts - hearts.hearts_left, int(elapsed / HEART_REFILL_INTERVAL))
+        gained = min(
+            hearts.max_hearts - hearts.hearts_left,
+            int(elapsed / HEART_REFILL_INTERVAL),
+        )
         hearts.hearts_left += gained
-        hearts.last_refill_ts = datetime.now() - (elapsed - gained * HEART_REFILL_INTERVAL) if gained else hearts.last_refill_ts
+        remainder = elapsed - gained * HEART_REFILL_INTERVAL
+        if gained:
+            hearts.last_refill_ts = utcnow() - remainder
+        if hearts.hearts_left >= hearts.max_hearts:
+            hearts.last_refill_ts = None
         db.flush()
+
+
+def refill_at(hearts: Hearts) -> str | None:
+    """ISO timestamp of the next heart refill, or None when full/not started."""
+    if hearts.hearts_left >= hearts.max_hearts or not hearts.last_refill_ts:
+        return None
+    return (hearts.last_refill_ts + HEART_REFILL_INTERVAL).isoformat()
+
+
+def hearts_state(hearts: Hearts) -> dict:
+    return {
+        "hearts_left": hearts.hearts_left,
+        "max_hearts": hearts.max_hearts,
+        "refill_at": refill_at(hearts),
+    }
+
+
+def charge_heart(db: Session, user_id: str) -> Hearts:
+    """Spend exactly one heart (e.g. checking the article mid-quiz). 403 when empty."""
+    hearts = get_hearts(db, user_id)
+    if hearts.hearts_left <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You're out of hearts — wait for a refill before continuing",
+        )
+    hearts.hearts_left -= 1
+    if not hearts.last_refill_ts:
+        hearts.last_refill_ts = utcnow()
+    db.flush()
+    return hearts
 
 
 def award_xp(db: Session, user: User, amount: int) -> None:

@@ -10,6 +10,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -24,6 +25,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(80))
     password_hash: Mapped[str] = mapped_column(String(255))
+    role: Mapped[str] = mapped_column(String(20), default="user")  # "user" | "admin"
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
     # Gamification
@@ -108,8 +110,27 @@ class QuizQuestion(Base):
     explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
     difficulty: Mapped[int] = mapped_column(Integer, default=1)
     knowledge_type: Mapped[str] = mapped_column(String(24), default="article_subject")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     article: Mapped["Article"] = relationship(backref="quiz_questions")
+
+
+class ArticleRevision(Base):
+    """Audit trail for a content amendment/change to an article."""
+
+    __tablename__ = "article_revisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    article_id: Mapped[str] = mapped_column(ForeignKey("articles.id"), index=True)
+    changed_by: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    amendment_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    amendment_act: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    snapshot: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+    article: Mapped["Article"] = relationship(backref="revisions")
+    author: Mapped["User"] = relationship(backref="revisions")
 
 
 class UserArticleProgress(Base):
@@ -142,8 +163,8 @@ class Hearts(Base):
     __tablename__ = "hearts"
 
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    hearts_left: Mapped[int] = mapped_column(Integer, default=5)
-    max_hearts: Mapped[int] = mapped_column(Integer, default=5)
+    hearts_left: Mapped[int] = mapped_column(Integer, default=10)
+    max_hearts: Mapped[int] = mapped_column(Integer, default=10)
     last_refill_ts: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 

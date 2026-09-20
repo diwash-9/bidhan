@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -8,6 +10,7 @@ from app.schemas import (
     AnswerSubmission,
     ArticleProgressOut,
     CompleteResult,
+    HeartsState,
     QuizResult,
     UserProgressOut,
 )
@@ -37,6 +40,8 @@ def get_user_progress(user_id: str, db: Session = Depends(get_db)):
         total_xp=user.total_xp,
         last_active_date=user.last_active_date,
         hearts_left=hearts.hearts_left,
+        max_hearts=hearts.max_hearts,
+        hearts_refill_at=gamif_service.refill_at(hearts),
         articles=[ArticleProgressOut(article_id=r.article_id, status=r.status, stars=r.stars) for r in rows],
     )
 
@@ -68,15 +73,31 @@ def complete_article(user_id: str, article_id: str, db: Session = Depends(get_db
 @router.post("/users/{user_id}/quiz/{question_id}/attempt", response_model=QuizResult)
 def attempt_question(user_id: str, question_id: int, submission: AnswerSubmission, db: Session = Depends(get_db)):
     user = get_user_or_404(db, user_id)
+    # The refill timer runs on read; only truly-empty players are blocked.
+    hearts = get_hearts(db, user_id)
+    if hearts.hearts_left <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You're out of hearts — wait for a refill before continuing",
+        )
     result = grade_answer(db, user_id, submission)
     if result.is_correct:
         award_xp(db, user, result.xp_earned)
     else:
-        hearts = get_hearts(db, user_id)
-        if hearts.hearts_left > 0:
-            hearts.hearts_left -= 1
+        hearts.hearts_left -= 1
+        if not hearts.last_refill_ts:
+            hearts.last_refill_ts = datetime.now(timezone.utc)
     db.commit()
     return result
+
+
+@router.post("/users/{user_id}/hearts/use", response_model=HeartsState)
+def use_heart(user_id: str, db: Session = Depends(get_db)):
+    """Spend one heart deliberately (e.g. revealing the article mid-quiz)."""
+    get_user_or_404(db, user_id)
+    hearts = gamif_service.charge_heart(db, user_id)
+    db.commit()
+    return HeartsState(**gamif_service.hearts_state(hearts))
 
 
 @router.get("/leaderboard")

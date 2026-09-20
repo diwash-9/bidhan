@@ -28,13 +28,17 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+      <div className="w-full max-w-md bg-slate-900 border-2 border-royal-900 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-8">
-          <div className="inline-flex bg-emerald-500/20 p-3 rounded-2xl border border-emerald-500/30 text-emerald-400 font-bold text-2xl mb-3">
+          <div className="inline-flex bg-crimson-600/15 p-3 rounded-2xl border border-crimson-500/30 font-bold text-2xl mb-3">
             🇳🇵
           </div>
-          <h1 className="text-2xl font-bold text-emerald-400">Constitution Quest</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <h1 className="text-3xl font-bold font-display">
+            <span className="text-crimson-400">विधान</span>{' '}
+            <span className="text-white">Bidhan</span>
+          </h1>
+          <p className="text-sm text-royal-300 mt-1">Learn Nepal's Constitution</p>
+          <p className="text-xs text-slate-400 mt-2">
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
           </p>
         </div>
@@ -51,7 +55,7 @@ export default function AuthPage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Display name"
                 required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-crimson-500"
               />
             </div>
           )}
@@ -67,7 +71,7 @@ export default function AuthPage() {
               placeholder="you@example.com"
               autoComplete="email"
               required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-emerald-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-crimson-500"
             />
           </div>
           <div>
@@ -83,7 +87,7 @@ export default function AuthPage() {
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               required
               minLength={8}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-emerald-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-crimson-500"
             />
           </div>
 
@@ -96,7 +100,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 font-bold py-3 rounded-xl transition"
+            className="w-full bg-crimson-600 hover:bg-crimson-500 disabled:opacity-50 font-bold py-3 rounded-xl transition"
           >
             {busy ? 'Please wait…' : mode === 'login' ? 'Log In' : 'Create Account'}
           </button>
@@ -109,7 +113,7 @@ export default function AuthPage() {
               setMode(mode === 'login' ? 'register' : 'login')
               setError(null)
             }}
-            className="font-semibold text-emerald-400 hover:underline"
+            className="font-semibold text-crimson-400 hover:underline"
           >
             {mode === 'login' ? 'Sign up' : 'Log in'}
           </button>

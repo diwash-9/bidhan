@@ -16,9 +16,15 @@ def get_question_or_404(db: Session, question_id: int) -> QuizQuestion:
 
 
 def passed_quiz(db: Session, user_id: str, article_id: str) -> bool:
-    """True when the user answered every quiz question for the article correctly (at least once)."""
-    q_ids = select(QuizQuestion.id).where(QuizQuestion.article_id == article_id)
-    total = db.scalar(select(func.count()).select_from(QuizQuestion).where(QuizQuestion.article_id == article_id)) or 0
+    """True when the user answered every active quiz question for the article correctly (at least once)."""
+    q_ids = select(QuizQuestion.id).where(
+        QuizQuestion.article_id == article_id, QuizQuestion.active.is_(True)
+    )
+    total = db.scalar(
+        select(func.count())
+        .select_from(QuizQuestion)
+        .where(QuizQuestion.article_id == article_id, QuizQuestion.active.is_(True))
+    ) or 0
     if total == 0:
         return True  # no questions to gate on
     correct = db.scalar(

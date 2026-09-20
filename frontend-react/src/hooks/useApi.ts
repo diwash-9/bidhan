@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
+import type { AmendmentPayload } from '@/types'
 
 export function useParts() {
   return useQuery({
@@ -69,10 +70,69 @@ export function useAttemptQuestion() {
   return useMutation({
     mutationFn: ({ questionId, selectedOption }: { questionId: number; selectedOption: string }) =>
       api.attemptQuestion(userId as string, questionId, selectedOption),
-    onSuccess: (result) => {
-      if (result.is_correct) {
-        void queryClient.invalidateQueries({ queryKey: ['progress'] })
-      }
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['progress'] })
+    },
+  })
+}
+
+export function useHeart() {
+  const queryClient = useQueryClient()
+  const userId = useAuthStore((s) => s.user?.id)
+  return useMutation({
+    mutationFn: () => api.useHeart(userId as string),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['progress'] })
+    },
+  })
+}
+
+export function useAdminArticles(partNumber?: number, q?: string) {
+  return useQuery({
+    queryKey: ['admin-articles', partNumber, q],
+    queryFn: () => api.adminListArticles(partNumber, q),
+  })
+}
+
+export function useAdminArticle(articleId: string | null) {
+  return useQuery({
+    queryKey: ['admin-article', articleId],
+    queryFn: () => api.adminGetArticle(articleId as string),
+    enabled: !!articleId,
+  })
+}
+
+export function useAdminRevisions(articleId?: string) {
+  return useQuery({
+    queryKey: ['admin-revisions', articleId],
+    queryFn: () => api.adminListRevisions(articleId),
+  })
+}
+
+export function useAmendArticle() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ articleId, payload }: { articleId: string; payload: AmendmentPayload }) =>
+      api.amendArticle(articleId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin-article'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin-revisions'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin-articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['parts'] })
+    },
+  })
+}
+
+export function useCreateArticle() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: AmendmentPayload) => api.createArticle(payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin-revisions'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin-articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['parts'] })
     },
   })
 }

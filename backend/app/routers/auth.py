@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.routers.deps import get_current_user
 from app.schemas import RefreshRequest, TokenPair, UserLogin, UserOut, UserRegister
 from app.services import auth_service
-from app.services.progress_service import get_user_or_404
+from app.db.models import User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -25,7 +26,5 @@ def refresh(payload: RefreshRequest):
 
 
 @router.get("/me", response_model=UserOut)
-def me(authorization: str = Header(default=""), db: Session = Depends(get_db)):
-    token = authorization.removeprefix("Bearer ").strip()
-    user_id = auth_service.authorize(token)
-    return get_user_or_404(db, user_id)
+def me(user: User = Depends(get_current_user)):
+    return user

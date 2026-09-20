@@ -1,4 +1,4 @@
-# Constitution Quest 🇳🇵
+# विधान Bidhan 🇳🇵
 
 An interactive, gamified learning platform for the **Constitution of Nepal** (English translation) — built Duolingo-style. Work through 308 articles across 35 parts via a branching learning path, read structured lessons (articles → clauses → sub-clauses), and prove your knowledge with graded quizzes.
 
@@ -11,9 +11,11 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 - **Full constitution content** — all 308 articles parsed into parts, articles, clauses, and sub-clauses.
 - **Branching learning path** — articles unlock along a dependency graph (not a linear line).
 - **Graded quizzes** — quality question bank with explanations and difficulty levels.
+- **Healthy gameplay loop** — 10 hearts, refill 1 every 30 minutes (live countdown in the header); **you're blocked once you run out**. Lessons are two-phase: read the article, then take a hidden-article knowledge check — re-opening the article mid-quiz costs a heart.
 - **Gamification** — XP, streaks, hearts/lives, leagues, badges, sound, and celebrations.
 - **User accounts** — secure signup/login with JWT sessions and per-user progress.
 - **Instant search** — full-text search across article titles and content.
+- **Content admin** — role-gated admin panel to edit articles, clauses, dependencies and quiz questions; every save records an audited amendment (snapshot + effective date/act).
 
 ## Quickstart
 
@@ -58,6 +60,23 @@ npm run dev
 ```
 
 Open `http://localhost:5173` (Vite proxies `/api` to the backend on `:8000`).
+
+## Content admin (constitutional amendments)
+
+Admins can edit any article's metadata, clauses/sub-clauses, dependency edges and quiz
+questions from the in-app **Admin** tab (visible to admins only, or `/admin`).
+
+- Promote an existing user to admin (run from `backend/`):
+
+  ```bash
+  python -m app.db.make_admin you@example.com        # promote
+  python -m app.db.make_admin you@example.com --demote  # revert to user
+  ```
+
+- Editing is **direct**: publish replaces the article's content atomically and writes an
+  `article_revisions` row (full pre-edit snapshot, amendment date/act, summary, author). Quiz
+  question removal is a soft-delete (`active = false`) so prior answers keep their
+  referential integrity. Dependency edges are rebuilt in both directions on save.
 
 ## Project Structure
 

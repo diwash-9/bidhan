@@ -1,29 +1,66 @@
 import { Flame, Heart, LogOut, Star } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
+import RefillCountdown from '@/components/RefillCountdown'
 import { useUserProgress } from '@/hooks/useApi'
 import { useAuthStore } from '@/store/auth'
 
+function FlagMark() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-9 h-9" aria-hidden="true">
+      <path
+        d="M4 3h15.8l-4 4.6 4 4.6H4V3z"
+        fill="#dc143c"
+        stroke="#1e2f89"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4 12.8h12l-6 7.4-6-7.4z"
+        fill="#dc143c"
+        stroke="#1e2f89"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <g transform="translate(11.6 5.4) scale(0.62)">
+        <circle cx="3" cy="2.5" r="2.1" fill="#fff" />
+        <path d="M2 0.6a2.4 2.4 0 0 0 0 3.8 1.9 1.9 0 0 1 0-3.8z" fill="#dc143c" />
+      </g>
+      <g transform="translate(10.2 13.6) scale(0.62)">
+        <circle cx="2.6" cy="2.6" r="2.2" fill="#fff" />
+        <path d="M1.8 1a2.6 2.6 0 0 0 0 3.2 2 2 0 0 1 0-3.2z" fill="#dc143c" />
+      </g>
+    </svg>
+  )
+}
+
 export default function Header() {
   const { user, logout } = useAuthStore()
-  const { data: progress } = useUserProgress()
+  const { data: progress, refetch } = useUserProgress()
   const location = useLocation()
+
+  const heartsLeft = progress?.hearts_left ?? progress?.max_hearts ?? 10
+  const maxHearts = progress?.max_hearts ?? 10
+  const heartsFull = heartsLeft >= maxHearts
 
   const tabs = [
     { to: '/', label: 'Path' },
     { to: '/leaderboard', label: 'Leaderboard' },
     { to: '/profile', label: 'Profile' },
+    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
   ]
+  const isActive = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to))
 
   return (
-    <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center gap-4">
-      <Link to="/" className="flex items-center gap-3">
-        <div className="bg-emerald-500/20 p-2 rounded-xl border border-emerald-500/30 text-emerald-400 font-bold">
-          🇳🇵
-        </div>
+    <header className="border-b-2 border-royal-950 bg-gradient-to-r from-crimson-950/60 via-slate-950 to-royal-950/60 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center gap-4">
+      <Link to="/" className="flex items-center gap-3 group">
+        <FlagMark />
         <div>
-          <h1 className="font-bold text-lg text-emerald-400">Constitution Quest</h1>
-          <p className="text-xs text-slate-400">Nepal Legal Learning Path</p>
+          <h1 className="font-display font-black text-xl leading-none group-hover:opacity-90 transition">
+            <span className="text-crimson-400">विधान</span>{' '}
+            <span className="text-white">Bidhan</span>
+          </h1>
+          <p className="text-xs text-royal-300 mt-1 tracking-wide">Learn Nepal's Constitution</p>
         </div>
       </Link>
 
@@ -32,11 +69,11 @@ export default function Header() {
           <Link
             key={t.to}
             to={t.to}
-            aria-current={location.pathname === t.to ? 'page' : undefined}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${
-              location.pathname === t.to
-                ? 'bg-emerald-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
+            aria-current={isActive(t.to) ? 'page' : undefined}
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+              isActive(t.to)
+                ? 'bg-crimson-600 border-crimson-500 text-white shadow-lg shadow-crimson-900/30'
+                : 'border-transparent text-slate-300 hover:bg-royal-900/60 hover:text-white'
             }`}
           >
             {t.label}
@@ -45,22 +82,35 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full" title="Streak">
+        <div className="flex items-center gap-1.5 bg-slate-900 border border-royal-900 px-3 py-1.5 rounded-full" title="Streak">
           <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
           <span className="font-bold text-sm">{progress?.current_streak ?? user?.current_streak ?? 0}</span>
         </div>
-        <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full" title="XP">
+        <div className="flex items-center gap-1.5 bg-slate-900 border border-royal-900 px-3 py-1.5 rounded-full" title="XP">
           <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
           <span className="font-bold text-sm">{progress?.total_xp ?? user?.total_xp ?? 0} XP</span>
         </div>
-        <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full" title="Hearts">
-          <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-          <span className="font-bold text-sm">{progress?.hearts_left ?? 5}</span>
-        </div>
+        <span className="relative group">
+          <div
+            className="flex items-center gap-1.5 bg-slate-900 border border-crimson-900 px-3 py-1.5 rounded-full cursor-default"
+            title={heartsFull ? 'Hearts full' : 'Heart refills over time'}
+          >
+            <Heart className="w-5 h-5 text-crimson-500 fill-crimson-500" />
+            <span className="font-bold text-sm">
+              {heartsLeft}/{maxHearts}
+            </span>
+          </div>
+          {!heartsFull && progress?.hearts_refill_at && (
+            <span className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-800 border border-royal-800 text-royal-200 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition pointer-events-none shadow-xl z-50">
+              Next heart in{' '}
+              <RefillCountdown refillAt={progress.hearts_refill_at} onExpire={() => void refetch()} className="text-crimson-300 font-bold" />
+            </span>
+          )}
+        </span>
         <button
           onClick={logout}
           aria-label="Log out"
-          className="flex items-center gap-1.5 text-slate-400 hover:text-white px-2 py-1.5 rounded-full hover:bg-slate-800 transition"
+          className="flex items-center gap-1.5 text-slate-400 hover:text-white px-2 py-1.5 rounded-full hover:bg-royal-900/60 transition"
           title="Log out"
         >
           <LogOut className="w-5 h-5" />

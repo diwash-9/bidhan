@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.ratelimit import RateLimitMiddleware
-from app.routers import articles, auth, health, quiz, search, users
+from app.routers import admin, articles, auth, health, quiz, search, users
 
 setup_logging()
 
@@ -30,6 +30,7 @@ app.include_router(articles.router)
 app.include_router(quiz.router)
 app.include_router(users.router)
 app.include_router(search.router)
+app.include_router(admin.router)
 
 
 @app.get("/", include_in_schema=False)

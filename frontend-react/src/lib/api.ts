@@ -1,11 +1,16 @@
 import type {
+  AmendResult,
+  AmendmentPayload,
+  AdminArticle,
   ArticleDetail,
   ArticleSummary,
   CompleteResult,
+  HeartsState,
   LeaderboardEntry,
   Part,
   QuizQuestion,
   QuizResult,
+  Revision,
   TokenPair,
   User,
   UserProgress,
@@ -109,5 +114,38 @@ export const api = {
   },
   getLeaderboard(limit = 20): Promise<LeaderboardEntry[]> {
     return request(`/leaderboard?limit=${limit}`)
+  },
+
+  adminListArticles(partNumber?: number, q?: string): Promise<ArticleSummary[]> {
+    const params = new URLSearchParams()
+    if (partNumber) params.set('part_number', String(partNumber))
+    if (q) params.set('q', q)
+    const qs = params.toString()
+    return request(`/admin/articles${qs ? `?${qs}` : ''}`)
+  },
+  adminGetArticle(id: string): Promise<AdminArticle> {
+    return request(`/admin/articles/${id}`)
+  },
+  adminListRevisions(articleId?: string): Promise<Revision[]> {
+    const params = new URLSearchParams()
+    if (articleId) params.set('article_id', articleId)
+    const qs = params.toString()
+    return request(`/admin/revisions${qs ? `?${qs}` : ''}`)
+  },
+  amendArticle(articleId: string, payload: AmendmentPayload): Promise<AmendResult> {
+    return request(`/admin/articles/${articleId}/amend`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+  createArticle(payload: AmendmentPayload): Promise<AmendResult> {
+    return request('/admin/articles', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  useHeart(userId: string): Promise<HeartsState> {
+    return request(`/users/${userId}/hearts/use`, { method: 'POST' })
   },
 }
