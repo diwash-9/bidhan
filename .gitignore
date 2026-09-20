@@ -1,0 +1,39 @@
+# --- Python (backend / db scripts) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# --- Regenerable build artifacts ---
+db/constitution.db
+db/*.db
+
+# --- Environment & secrets (private) ---
+.env
+.env.*
+!.env.example
+
+# --- Node / frontend ---
+node_modules/
+dist/
+build/
+*.local
+
+# --- Private project docs (never pushed) ---
+.project-docs/
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
