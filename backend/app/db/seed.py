@@ -19,7 +19,10 @@ from app.db.models import (
 )
 from app.db.session import SessionLocal
 
-SQLITE_DB = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../db/constitution.db"))
+SQLITE_DB = os.environ.get(
+    "SQLITE_DB",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../db/constitution.db")),
+)
 
 
 def load_sqlite():
@@ -106,5 +109,9 @@ def seed(db: Session):
 
 if __name__ == "__main__":
     with SessionLocal() as db:
-        seed(db)
+        already = db.query(Article).count()
+        if already:
+            print(f"Skipping seed: articles already present ({already}).")
+        else:
+            seed(db)
     print("Seed complete.")
