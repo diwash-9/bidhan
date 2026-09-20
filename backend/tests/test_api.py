@@ -10,6 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://postgres:postgres@localhost:5432/constitution")
 
 from app.main import app  # noqa: E402
+from app.db.models import Hearts  # noqa: E402
+from app.db.session import SessionLocal  # noqa: E402
 
 client = TestClient(app)
 
@@ -113,6 +115,17 @@ def test_progress_materializes_rows(auth_user):
 
 def test_complete_article_bfs_unlock(auth_user):
     uid = auth_user["user_id"]
+    # Completions are gated on the article quiz; pass every question (correct letter is never leaked).
+    for q in client.get("/api/articles/ART-1/quiz").json():
+        for letter in ("A", "B", "C", "D"):
+            r = client.post(
+                f"/api/users/{uid}/quiz/{q['id']}/attempt",
+                json={"question_id": q["id"], "selected_option": letter},
+            )
+            assert r.status_code == 200, r.text
+            if r.json()["is_correct"]:
+                break
+
     r = client.post(f"/api/users/{uid}/articles/ART-1/complete")
     assert r.status_code == 200
     body = r.json()
@@ -120,11 +133,21 @@ def test_complete_article_bfs_unlock(auth_user):
     assert "ART-2" in body["unlocked_targets"]
 
     prog = client.get(f"/api/users/{uid}/progress").json()
-    assert prog["total_xp"] == 15
+    assert prog["total_xp"] == 35  # 4 questions passed (+20) + article completion (+15)
     statuses = {a["article_id"]: a["status"] for a in prog["articles"]}
     assert statuses["ART-1"] == "completed"
     assert statuses["ART-2"] == "unlocked"
     assert statuses["ART-3"] == "locked"
+
+
+def test_complete_requires_quiz_pass(auth_user):
+    uid = auth_user["user_id"]
+    # No quiz attempts for ART-2 yet -> completion must be refused.
+    r = client.post(f"/api/users/{uid}/articles/ART-2/complete")
+    assert r.status_code == 403
+    prog = client.get(f"/api/users/{uid}/progress").json()
+    statuses = {a["article_id"]: a["status"] for a in prog["articles"]}
+    assert statuses["ART-2"] == "unlocked"
 
 
 def test_quiz_attempt_correct_awards_xp(auth_user):
@@ -151,6 +174,15 @@ def test_quiz_attempt_correct_awards_xp(auth_user):
 
 def test_quiz_attempt_wrong_consumes_heart(auth_user):
     uid = auth_user["user_id"]
+    # Isolate this test from prior hearts spent by the completion tests.
+    with SessionLocal() as db:
+        h = db.get(Hearts, uid)
+        if h is None:
+            db.add(Hearts(user_id=uid, hearts_left=5, max_hearts=5))
+        else:
+            h.hearts_left = 5
+            h.last_refill_ts = None
+        db.commit()
     q = client.get("/api/articles/ART-1/quiz").json()[0]
     before = client.get(f"/api/users/{uid}/progress").json()["hearts_left"]
     r = client.post(

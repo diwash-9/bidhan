@@ -11,7 +11,7 @@ import type {
   UserProgress,
 } from '../types'
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8000/api'
+const API_BASE = import.meta.env.VITE_API_BASE ?? '/api'
 const TOKEN_KEY = 'cq_access_token'
 const REFRESH_KEY = 'cq_refresh_token'
 
@@ -61,7 +61,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     } catch {
       detail = res.statusText
     }
-    throw new ApiError(res.status, `Request failed (${res.status})`, detail)
+    throw new ApiError(res.status, detail ?? `Request failed (${res.status})`, detail)
   }
   return res.json() as Promise<T>
 }

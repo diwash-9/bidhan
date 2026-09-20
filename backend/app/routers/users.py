@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,7 @@ from app.schemas import (
 from app.services import gamif_service
 from app.services.gamif_service import award_xp, bfs_unlock, ensure_progress_rows, get_hearts, mark_active, XP_PER_ARTICLE
 from app.services.progress_service import get_article_or_404, get_progress_rows, get_user_or_404
-from app.services.quiz_service import grade_answer
+from app.services.quiz_service import grade_answer, passed_quiz
 
 router = APIRouter(prefix="/api", tags=["users"])
 
@@ -51,6 +51,11 @@ def complete_article(user_id: str, article_id: str, db: Session = Depends(get_db
     row = get_progress_rows(db, user_id, article_id)
     mark_active(db, user)
     if row.status != "completed":
+        if not passed_quiz(db, user_id, article_id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Answer every quiz question correctly before finishing this lesson",
+            )
         row.status = "completed"
         row.stars = max(row.stars, 3)
         award_xp(db, user, XP_PER_ARTICLE)

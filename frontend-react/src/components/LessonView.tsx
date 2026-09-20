@@ -16,10 +16,11 @@ export default function LessonView() {
   const attemptMutation = useAttemptQuestion()
 
   const current = quiz[currentIdx]
-  const finished = currentIdx >= quiz.length
+  const allCorrect = quiz.every((q) => answers[q.id]?.is_correct === true)
+  const finished = currentIdx >= quiz.length && allCorrect
 
   const handleAnswer = async (letter: string) => {
-    if (!current || answers[current.id]) return
+    if (!current || answers[current.id]?.is_correct) return
     const result = await attemptMutation.mutateAsync({ questionId: current.id, selectedOption: letter })
     setAnswers((prev) => ({ ...prev, [current.id]: result }))
   }
@@ -94,7 +95,7 @@ export default function LessonView() {
                     <button
                       key={opt}
                       onClick={() => handleAnswer(opt)}
-                      disabled={!!answered}
+                      disabled={answered?.is_correct === true}
                       className={`p-3 rounded-xl text-left text-sm font-semibold transition border ${style}`}
                     >
                       <span className="font-bold mr-2">{opt}.</span> {text}
@@ -122,12 +123,18 @@ export default function LessonView() {
                         <span className="flex items-center gap-2"><XCircle className="w-4 h-4 shrink-0" /> -1 ♥ — {answered.explanation}</span>
                       )}
                     </div>
-                    <button
-                      onClick={handleNext}
-                      className="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-3 rounded-xl transition"
-                    >
-                      {currentIdx + 1 < quiz.length ? 'Next Question' : 'Finish Quiz'}
-                    </button>
+                    {answered.is_correct ? (
+                      <button
+                        onClick={handleNext}
+                        className="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-3 rounded-xl transition"
+                      >
+                        {currentIdx + 1 < quiz.length ? 'Next Question' : 'Finish Quiz'}
+                      </button>
+                    ) : (
+                      <p className="mt-3 text-center text-xs text-slate-400">
+                        Not quite — pick another option to try again.
+                      </p>
+                    )}
                   </div>
                 )
               })()}
@@ -136,7 +143,7 @@ export default function LessonView() {
 
           {finished && (
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold text-center">
-              Quiz complete! 🎉 Review complete — you may finish the lesson.
+              Quiz passed! 🎉 You may finish the lesson.
             </div>
           )}
         </div>
