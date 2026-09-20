@@ -105,6 +105,8 @@ export interface UserProgress {
   hearts_left: number
   max_hearts: number
   hearts_refill_at: string | null
+  weekly_xp: number
+  weekly_xp_goal: number
   articles: ArticleProgress[]
 }
 
@@ -119,6 +121,7 @@ export interface LeaderboardEntry {
   user_id: string
   display_name: string
   total_xp: number
+  xp_earned: number
   current_streak: number
 }
 

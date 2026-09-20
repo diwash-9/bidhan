@@ -13,6 +13,8 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 - **Graded quizzes** — quality question bank with explanations and difficulty levels.
 - **Healthy gameplay loop** — 10 hearts, refill 1 every 30 minutes (live countdown in the header); **you're blocked once you run out**. Lessons are two-phase: read the article, then take a hidden-article knowledge check — re-opening the article mid-quiz costs a heart.
 - **Gamification** — XP, streaks, hearts/lives, leagues, badges, sound, and celebrations.
+- **Practice mode** — replay any completed lesson for reduced XP (+4/question, zero heart cost) to keep your weekly quest going.
+- **Weekly quest & leaderboard** — a 100 XP weekly goal with a live progress bar on the path, plus a weekly-first leaderboard (This Week / All-Time toggle).
 - **User accounts** — secure signup/login with JWT sessions and per-user progress.
 - **Instant search** — full-text search across article titles and content.
 - **Content admin** — role-gated admin panel to edit articles, clauses, dependencies and quiz questions; every save records an audited amendment (snapshot + effective date/act).

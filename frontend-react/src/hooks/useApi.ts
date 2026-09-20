@@ -45,10 +45,10 @@ export function useUserProgress() {
   })
 }
 
-export function useLeaderboard(limit = 20) {
+export function useLeaderboard(limit = 20, window: 'all' | 'week' = 'all') {
   return useQuery({
-    queryKey: ['leaderboard'],
-    queryFn: () => api.getLeaderboard(limit),
+    queryKey: ['leaderboard', window],
+    queryFn: () => api.getLeaderboard(limit, window),
   })
 }
 
@@ -68,10 +68,11 @@ export function useAttemptQuestion() {
   const queryClient = useQueryClient()
   const userId = useAuthStore((s) => s.user?.id)
   return useMutation({
-    mutationFn: ({ questionId, selectedOption }: { questionId: number; selectedOption: string }) =>
-      api.attemptQuestion(userId as string, questionId, selectedOption),
+    mutationFn: ({ questionId, selectedOption, practice = false }: { questionId: number; selectedOption: string; practice?: boolean }) =>
+      api.attemptQuestion(userId as string, questionId, selectedOption, practice),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['progress'] })
+      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] })
     },
   })
 }

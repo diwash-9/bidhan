@@ -106,14 +106,21 @@ export const api = {
   completeArticle(userId: string, articleId: string): Promise<CompleteResult> {
     return request(`/users/${userId}/articles/${articleId}/complete`, { method: 'POST' })
   },
-  attemptQuestion(userId: string, questionId: number, selectedOption: string): Promise<QuizResult> {
-    return request(`/users/${userId}/quiz/${questionId}/attempt`, {
+  attemptQuestion(
+    userId: string,
+    questionId: number,
+    selectedOption: string,
+    practice = false,
+  ): Promise<QuizResult> {
+    return request(`/users/${userId}/quiz/${questionId}/attempt${practice ? '?practice=1' : ''}`, {
       method: 'POST',
       body: JSON.stringify({ question_id: questionId, selected_option: selectedOption }),
     })
   },
-  getLeaderboard(limit = 20): Promise<LeaderboardEntry[]> {
-    return request(`/leaderboard?limit=${limit}`)
+  getLeaderboard(limit = 20, window?: 'all' | 'week'): Promise<LeaderboardEntry[]> {
+    const params = new URLSearchParams({ limit: String(limit) })
+    if (window) params.set('window', window)
+    return request(`/leaderboard?${params.toString()}`)
   },
 
   adminListArticles(partNumber?: number, q?: string): Promise<ArticleSummary[]> {

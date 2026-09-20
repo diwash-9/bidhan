@@ -1,16 +1,21 @@
 import time
 
-from fastapi import HTTPException, Request, status
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
 from app.core.config import settings
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Naive in-memory sliding-window rate limiter, keyed by client IP.
+    """In-memory sliding-window rate limiter, keyed by client IP.
 
     Suitable for single-instance dev/staging; swap for a Redis-backed limiter
     when running multiple replicas behind a load balancer.
+
+    A Response is returned directly (rather than raising HTTPException) so the
+    status stays a proper 429; raising from middleware gets coerced to 500 by
+    Starlette's error handling.
     """
 
     def __init__(self, app, limit: int | None = None, window: float = 60.0):
@@ -20,15 +25,15 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._hits: dict[str, list[float]] = {}
 
     async def dispatch(self, request: Request, call_next):
-        client = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown")
+        client = request.headers.get(
+            "x-forwarded-for", request.client.host if request.client else "unknown"
+        )
         now = time.monotonic()
-        hits = self._hits.setdefault(client, [])
-        hits.append(now)
-        if len(hits) > 1000:
-            # Trim old timestamps opportunistically.
-            cutoff = now - self.window
-            self._hits[client] = [t for t in hits if t >= cutoff]
-            hits = self._hits[client]
+        cutoff = now - self.window
+        hits = [t for t in self._hits.get(client, []) if t >= cutoff]
         if len(hits) > self.limit:
-            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Rate limit exceeded")
+            self._hits[client] = hits
+            return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
+        hits.append(now)
+        self._hits[client] = hits
         return await call_next(request)

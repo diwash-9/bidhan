@@ -15,6 +15,8 @@ from app.db.models import (
 
 XP_PER_ARTICLE = 15
 XP_PER_QUESTION = 5
+PRACTICE_XP_PER_QUESTION = 4
+WEEKLY_XP_GOAL = 100
 HEART_REFILL_INTERVAL = timedelta(minutes=30)
 MAX_HEARTS = 10
 
@@ -185,7 +187,40 @@ def bfs_unlock(db: Session, user_id: str, completed_article_id: str) -> list[str
     return newly_unlocked
 
 
-def get_leaderboard(db: Session, limit: int = 20) -> list[dict]:
+def current_week_xp(db: Session, user_id: str) -> int:
+    """XP earned this week per the weekly `leagues` snapshot (0 if not started)."""
+    league = db.scalar(
+        select(League).where(
+            League.week_start == monday_of_current_week(),
+            League.user_id == user_id,
+        )
+    )
+    return league.xp_earned if league else 0
+
+
+def get_leaderboard(db: Session, limit: int = 20, window: str = "all") -> list[dict]:
+    if window == "week":
+        week_start = monday_of_current_week()
+        q = (
+            select(User, League.xp_earned)
+            .join(League, League.user_id == User.id)
+            .where(League.week_start == week_start)
+            .order_by(League.xp_earned.desc(), User.display_name.asc())
+            .limit(limit)
+        )
+        rows = db.execute(q).all()
+        return [
+            {
+                "rank": i + 1,
+                "user_id": u.id,
+                "display_name": u.display_name,
+                "total_xp": u.total_xp,
+                "xp_earned": xp,
+                "current_streak": u.current_streak,
+            }
+            for i, (u, xp) in enumerate(rows)
+        ]
+
     rows = db.execute(
         select(User).order_by(User.total_xp.desc(), User.display_name.asc()).limit(limit)
     ).scalars().all()
@@ -195,6 +230,7 @@ def get_leaderboard(db: Session, limit: int = 20) -> list[dict]:
             "user_id": u.id,
             "display_name": u.display_name,
             "total_xp": u.total_xp,
+            "xp_earned": u.total_xp,
             "current_streak": u.current_streak,
         }
         for i, u in enumerate(rows)

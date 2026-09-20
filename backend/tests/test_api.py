@@ -332,6 +332,69 @@ def test_hearts_full_resets_timer(auth_user):
     assert data["hearts_refill_at"] is None
 
 
+# --- Practice mode + weekly quest ---
+
+
+def test_practice_awards_reduced_xp_without_hearts(auth_user):
+    uid = auth_user["user_id"]
+    # ART-1 is completed by the earlier completion test; practice must not spend hearts.
+    with SessionLocal() as db:
+        h = db.get(Hearts, uid)
+        h.hearts_left = 1
+        db.commit()
+    q = client.get("/api/articles/ART-1/quiz").json()[0]
+    before_xp = client.get(f"/api/users/{uid}/progress").json()["total_xp"]
+    correct = None
+    for letter in ("A", "B", "C", "D"):
+        r = client.post(
+            f"/api/users/{uid}/quiz/{q['id']}/attempt?practice=1",
+            json={"question_id": q["id"], "selected_option": letter},
+        )
+        assert r.status_code == 200, r.text
+        if r.json()["is_correct"]:
+            correct = r.json()
+            break
+    assert correct is not None
+    assert correct["xp_earned"] == 4
+    after = client.get(f"/api/users/{uid}/progress").json()
+    assert after["total_xp"] == before_xp + 4
+    # Misses during practice cost no hearts.
+    assert after["hearts_left"] == 1
+
+
+def test_practice_blocked_on_uncompleted(auth_user):
+    uid = auth_user["user_id"]
+    # ART-2 is unlocked (not completed) in this suite -> practice refused.
+    qs = client.get("/api/articles/ART-2/quiz").json()
+    if not qs:
+        pytest.skip("ART-2 has no active questions")
+    r = client.post(
+        f"/api/users/{uid}/quiz/{qs[0]['id']}/attempt?practice=1",
+        json={"question_id": qs[0]["id"], "selected_option": "A"},
+    )
+    assert r.status_code == 403
+    assert "completed" in r.json()["detail"].lower()
+
+
+def test_progress_reports_weekly_quest(auth_user):
+    uid = auth_user["user_id"]
+    before = client.get(f"/api/users/{uid}/progress").json()
+    assert before["weekly_xp_goal"] == 100
+    assert before["weekly_xp"] >= 0
+    assert before["weekly_xp"] <= before["total_xp"]
+    # Earn weekly XP through practice (no hearts involved).
+    q = client.get("/api/articles/ART-1/quiz").json()[0]
+    for letter in ("A", "B", "C", "D"):
+        r = client.post(
+            f"/api/users/{uid}/quiz/{q['id']}/attempt?practice=1",
+            json={"question_id": q["id"], "selected_option": letter},
+        )
+        if r.status_code == 200 and r.json()["is_correct"]:
+            break
+    after = client.get(f"/api/users/{uid}/progress").json()
+    assert after["weekly_xp"] > before["weekly_xp"]
+
+
 # --- Search ---
 
 
@@ -345,6 +408,22 @@ def test_leaderboard():
     r = client.get("/api/leaderboard")
     assert r.status_code == 200
     assert isinstance(r.json(), list)
+
+
+def test_leaderboard_weekly_window(auth_user):
+    uid = auth_user["user_id"]
+    before_xp = client.get(f"/api/users/{uid}/progress").json()["weekly_xp"]
+    # Weekly XP is authoritative from the leagues snapshot.
+    rows = client.get("/api/leaderboard", params={"window": "week", "limit": 100}).json()
+    assert rows
+    assert all("xp_earned" in row for row in rows)
+    assert [row["xp_earned"] for row in rows] == sorted((row["xp_earned"] for row in rows), reverse=True)
+    me = next((row for row in rows if row["user_id"] == uid), None)
+    if me:
+        assert me["xp_earned"] == before_xp
+    # All-time window keeps total_xp semantics.
+    rows_all = client.get("/api/leaderboard", params={"window": "all"}).json()
+    assert all(row["xp_earned"] == row["total_xp"] for row in rows_all)
 
 
 # --- Admin ---

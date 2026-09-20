@@ -134,6 +134,8 @@ class UserProgressOut(BaseModel):
     hearts_left: int
     max_hearts: int
     hearts_refill_at: str | None
+    weekly_xp: int
+    weekly_xp_goal: int
     articles: list[ArticleProgressOut]
 
 
@@ -154,6 +156,7 @@ class LeaderboardEntry(BaseModel):
     user_id: str
     display_name: str
     total_xp: int
+    xp_earned: int = 0
     current_streak: int
 
 

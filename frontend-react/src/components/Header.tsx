@@ -1,8 +1,10 @@
-import { Flame, Heart, LogOut, Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Flame, Heart, LogOut, Star, Volume2, VolumeX } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import RefillCountdown from '@/components/RefillCountdown'
 import { useUserProgress } from '@/hooks/useApi'
+import { isSoundMuted, setSoundMuted } from '@/lib/sfx'
 import { useAuthStore } from '@/store/auth'
 
 function FlagMark() {
@@ -38,6 +40,17 @@ export default function Header() {
   const { user, logout } = useAuthStore()
   const { data: progress, refetch } = useUserProgress()
   const location = useLocation()
+  const [soundMuted, setMuted] = useState(isSoundMuted())
+
+  useEffect(() => {
+    setMuted(isSoundMuted())
+  }, [])
+
+  const toggleSound = () => {
+    const next = !soundMuted
+    setSoundMuted(next)
+    setMuted(next)
+  }
 
   const heartsLeft = progress?.hearts_left ?? progress?.max_hearts ?? 10
   const maxHearts = progress?.max_hearts ?? 10
@@ -107,6 +120,15 @@ export default function Header() {
             </span>
           )}
         </span>
+        <button
+          onClick={toggleSound}
+          aria-label={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+          aria-pressed={soundMuted}
+          className="flex items-center gap-1.5 text-slate-400 hover:text-white px-2 py-1.5 rounded-full hover:bg-royal-900/60 transition"
+          title={soundMuted ? 'Sound off' : 'Sound on'}
+        >
+          {soundMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
         <button
           onClick={logout}
           aria-label="Log out"
