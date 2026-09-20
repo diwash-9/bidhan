@@ -48,6 +48,7 @@ export default function PathView() {
               <Link
                 to={`/lesson/${art.id}`}
                 onClick={(e) => { if (!isUnlocked) e.preventDefault() }}
+                aria-label={`Article ${art.article_number}: ${art.title} - ${isCompleted ? 'completed' : isUnlocked ? 'unlocked' : 'locked'}`}
                 className={`relative group w-20 h-20 rounded-full flex items-center justify-center font-bold text-lg transition-all shadow-xl ${
                   isCompleted
                     ? 'bg-emerald-500 text-slate-950 ring-4 ring-emerald-500/30 hover:scale-105'

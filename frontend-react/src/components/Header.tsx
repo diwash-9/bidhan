@@ -32,6 +32,7 @@ export default function Header() {
           <Link
             key={t.to}
             to={t.to}
+            aria-current={location.pathname === t.to ? 'page' : undefined}
             className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${
               location.pathname === t.to
                 ? 'bg-emerald-600 text-white'
@@ -58,6 +59,7 @@ export default function Header() {
         </div>
         <button
           onClick={logout}
+          aria-label="Log out"
           className="flex items-center gap-1.5 text-slate-400 hover:text-white px-2 py-1.5 rounded-full hover:bg-slate-800 transition"
           title="Log out"
         >

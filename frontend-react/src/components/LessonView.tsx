@@ -109,6 +109,7 @@ export default function LessonView() {
                 return (
                   <div className="mt-4">
                     <div
+                      role="status"
                       className={`p-4 rounded-xl border font-semibold text-sm ${
                         answered.is_correct
                           ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'

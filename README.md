@@ -23,7 +23,7 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 - PostgreSQL 14+ (local install or Docker)
 
 ### 1. Database
-Create a database and user, then set credentials:
+Create a database and user, then set credentials in `backend/.env` (`DATABASE_URL`):
 
 ```sql
 CREATE DATABASE constitution;
@@ -38,11 +38,12 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 # source .venv/bin/activate   # macOS/Linux
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 # Configure (copy to .env and adjust)
 cp ../.env.example .env
 alembic upgrade head
+python -m app.db.seed          # loads content + quiz bank from db/constitution.db
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -56,7 +57,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Open `http://localhost:5173` (Vite proxies `/api` to the backend on `:8000`).
 
 ## Project Structure
 
@@ -67,11 +68,14 @@ db/               legacy content/seed scripts
 data/             raw constitution source (JSON, PDF)
 ```
 
-## Running the tests
+## Running the tests and checks
 
 ```bash
-cd backend && pytest
-cd frontend-react && npm run lint
+# Backend: unit + integration tests, lint
+cd backend && pytest && ruff check .
+
+# Frontend: typecheck, lint, production build
+cd frontend-react && npm run typecheck && npm run lint && npm run build
 ```
 
 ## Deployment
