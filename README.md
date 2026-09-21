@@ -21,47 +21,16 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 
 ## Quickstart
 
-### Prerequisites
-- Python 3.11+
-- Node 18+ (Node 22 recommended)
-- PostgreSQL 14+ (local install or Docker)
+### The Easiest Way (Docker)
+Simply double-click **`run.bat`** (or run `run.bat` in your terminal). 
+This will automatically build and start the database, backend, and frontend.
 
-### 1. Database
-Create a database and user, then set credentials in `backend/.env` (`DATABASE_URL`):
+- **Frontend App:** [http://localhost:5173](http://localhost:5173)
+- **Backend API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
-```sql
-CREATE DATABASE constitution;
-CREATE USER constitution WITH PASSWORD 'constitution';
-GRANT ALL PRIVILEGES ON DATABASE constitution TO constitution;
-```
+To stop the app, run **`stop.bat`** or `docker compose down`.
 
-### 2. Backend
-
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS/Linux
-pip install -r requirements-dev.txt
-
-# Configure (copy to .env and adjust)
-cp ../.env.example .env
-alembic upgrade head
-python -m app.db.seed          # loads content + quiz bank from db/constitution.db
-uvicorn app.main:app --reload --port 8000
-```
-
-API docs: `http://127.0.0.1:8000/docs`
-
-### 3. Frontend
-
-```bash
-cd frontend-react
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173` (Vite proxies `/api` to the backend on `:8000`).
+---
 
 ## Content admin (constitutional amendments)
 
