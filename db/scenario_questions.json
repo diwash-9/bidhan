@@ -598,5 +598,89 @@
   "explanation": "Article 48 (1) lists the duties of every citizen, including (a) safeguarding nationality, sovereignty and integrity, (b) abiding by the Constitution and law, (c) rendering compulsory service as and when the State so requires, and further duties to protect public property and common property.",
   "difficulty": 1,
   "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-49",
+  "question_text": "A provincial minister says the directive principles of the State are 'mere suggestions' that his government may ignore entirely while governing. Under the Constitution, this claim is:",
+  "option_a": "Correct, because the State may govern however it pleases",
+  "option_b": "Incorrect: the directive principles, policies and obligations of the State shall be the guiding principles for the governance of the State, and the State shall mobilize means and resources to implement them as required",
+  "option_c": "Correct, because only courts may enforce these principles through writ petitions",
+  "option_d": "Correct except during the first five years of a government's term",
+  "correct_option": "B",
+  "explanation": "Article 49 (1) provides that the directive principles, policies and obligations set forth in Part 4 'shall be the guiding principles for the governance of the State,' and clause (2) requires the State to mobilize means and resources, as required, to implement them.",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-50",
+  "question_text": "A legislator argues that the economic objectives of the State are limited to growing the private business of the wealthy, and that the State has no duty toward egalitarian society. Under the Constitution, the economic objective is to:",
+  "option_a": "Achieve sustainable economic development through participation and development of public, private and cooperative sectors, leading to a socialism-oriented, independent and self-reliant economy",
+  "option_b": "Privatize all means of production in favour of a few conglomerates",
+  "option_c": "Rely exclusively on foreign aid without domestic mobilization",
+  "option_d": "Keep the economy small so that the State stays simple",
+  "correct_option": "A",
+  "explanation": "Article 50 (3) states the economic objective of the State: sustainable economic development with rapid growth through maximum mobilization of available means and resources, with participation and development of public, private and cooperative sectors, building a socialism-oriented independent and prosperous economy that is self-reliant and progressive.",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-51",
+  "question_text": "A district official says the State's policies are optional reading, not something citizens may expect the Government to pursue. Under the Constitution, the State shall:",
+  "option_a": "Ignore its policies unless a private investor funds them",
+  "option_b": "Have discretion only in times of emergency",
+  "option_c": "Pursue the policies of the State, which form part of the guiding principles for governance",
+  "option_d": "Pursue policies only for citizens who pay extra taxes",
+  "correct_option": "C",
+  "explanation": "Article 51 (1) begins: 'The State shall pursue the following policies' — a long catalogue covering social justice, equality, economic development, education and culture. Read with Article 49, these policies guide, though (per Article 55) they are not directly enforceable in court.",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-52",
+  "question_text": "A commentator claims the State's only obligation is to keep order, and that protecting fundamental rights or building a prosperous nation is beyond its duties. Under the Constitution, it is the obligation of the State to:",
+  "option_a": "Make Nepal a prosperous and affluent country by protecting and promoting fundamental rights and human rights, pursuing the directive principles and gradually implementing the policies, while keeping intact the freedom, sovereignty, territorial integrity and independence of Nepal",
+  "option_b": "Do nothing beyond collecting revenue and maintaining police",
+  "option_c": "Focus solely on international relations, leaving domestic welfare to NGOs",
+  "option_d": "Guarantee prosperity only for public employees",
+  "correct_option": "A",
+  "explanation": "Article 52 (1): 'It shall be the obligation of the State to make Nepal a prosperous and affluent country by protecting and promoting fundamental rights and human rights, pursuing directive principles of the State and gradually implementing policies of the State, while keeping intact the freedom, sovereignty, territorial integrity and independence of Nepal.'",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-53",
+  "question_text": "A citizens' group asks how the people will ever know what the Government has done toward the directive principles. The Constitution provides that the Government of Nepal:",
+  "option_a": "May report only if Parliament insists in writing",
+  "option_b": "Shall submit an annual report on the steps taken and achievements made in implementing the directive principles, policies and obligations, which the President shall cause to be laid through the Prime Minister before the Federal Parliament",
+  "option_c": "Must publish such a report in the Gazette without any parliamentary laying",
+  "option_d": "Has no reporting duty whatsoever in this regard",
+  "correct_option": "B",
+  "explanation": "Article 53 (1) requires the Government of Nepal to submit an annual report of steps taken and achievements made in the implementation of the directive principles, policies and obligations of the State to the President, who shall cause it to be laid through the Prime Minister before the Federal Parliament.",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-54",
+  "question_text": "A law student asks where within the Federal Parliament the progressive implementation of the directive principles would be reviewed. The Constitution requires:",
+  "option_a": "A committee in the Federal Parliament, in accordance with law, to monitor and evaluate whether the directive principles, policies and obligations have been implemented progressively",
+  "option_b": "A private audit firm appointed by the Government itself",
+  "option_c": "No monitoring at all, since these principles are not binding",
+  "option_d": "A commission composed exclusively of provincial chief ministers",
+  "correct_option": "A",
+  "explanation": "Article 54 (1): 'There shall be a committee, in accordance with law, in the Federal Parliament in order to monitor and evaluate whether the directive principles, policies and obligations of the State set forth in this Part have been implemented progressively or not.'",
+  "difficulty": 1,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-55",
+  "question_text": "A citizen files a case in court demanding that judges order the State, by decree, to complete a specific economic policy of Article 51 immediately. Under the Constitution, the court should:",
+  "option_a": "Order full implementation at once, citing Part 4 as binding law",
+  "option_b": "Partially order it, since every policy is a constitutional command",
+  "option_c": "Dismiss the question: no question may be raised in any court as to whether any matter contained in Part 4 has been implemented",
+  "option_d": "Order implementation but only for citizens residing in municipalities",
+  "correct_option": "C",
+  "explanation": "Article 55 (1): 'No question shall be raised in any court as to whether any matter contained in this Part has been implemented or not.' The directive principles are guiding and non-justiciable, in contrast to the enforceable fundamental rights of Part 3.",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
  }
 ]
