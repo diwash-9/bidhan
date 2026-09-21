@@ -106,5 +106,101 @@
     "explanation": "Article 9 (3): 'The Rhododendron Arboreum shall be the national flower, Crimson Colour shall be the national colour, the Cow shall be the national animal and the Lophophorus shall be the national bird of Nepal.'",
     "difficulty": 1,
     "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-10",
+    "question_text": "After living and working abroad for many years, a Nepali citizen returns home and is told by an official that he has lost his right to citizenship because of the long stay overseas. What does the Constitution say about this?",
+    "option_a": "No citizen of Nepal may be deprived of the right to obtain citizenship",
+    "option_b": "The right is lost automatically after ten continuous years abroad",
+    "option_c": "The right lapses and can only be restored by paying a fine",
+    "option_d": "Citizenship ends once a person takes up residence in another country",
+    "correct_option": "A",
+    "explanation": "Article 10 (1): 'No citizen of Nepal may be deprived of the right to obtain citizenship.' Article 10 (2) adds that there is a single federal citizenship with State identity in Nepal.",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-11",
+    "question_text": "Anjali, a Nepali citizen by descent, is married to a French citizen. Their daughter Sita was born in Nepal, permanently resides there and has never acquired any foreign citizenship. How can Sita obtain Nepali citizenship?",
+    "option_a": "Not at all - a child of a foreign father can never be a citizen",
+    "option_b": "She may acquire naturalized citizenship, since she was born to a Nepali mother, has permanently resided in Nepal and has not acquired a foreign citizenship",
+    "option_c": "Only after both parents obtain a court order approving her citizenship",
+    "option_d": "Only by being granted honorary citizenship by the Government of Nepal",
+    "correct_option": "B",
+    "explanation": "Article 11 (7): in the case of a person born from a woman who is a citizen of Nepal and married to a foreign citizen, the person may acquire the naturalized citizenship of Nepal in accordance with the Federal law if he or she has permanently resided in Nepal and has not acquired the citizenship of a foreign country.",
+    "difficulty": 2,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-11",
+    "question_text": "Elena, a foreign national, marries a Nepali citizen. Which statement about her citizenship matches the Constitution?",
+    "option_a": "She automatically becomes a citizen on the day of the wedding",
+    "option_b": "She may, if she so wishes, acquire the naturalized citizenship of Nepal as provided for in the Federal law",
+    "option_c": "She must wait twenty years before she may apply",
+    "option_d": "She can never become a citizen while she remains married",
+    "correct_option": "B",
+    "explanation": "Article 11 (6): 'A foreign woman who has a matrimonial relationship with a citizen of Nepal may, if she so wishes, acquire the naturalized citizenship of Nepal as provided for in the Federal law.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-11",
+    "question_text": "A newborn is found abandoned in Kathmandu and nobody knows who the parents are. What does the Constitution provide until the parents are traced?",
+    "option_a": "The child is stateless and entrusted to the care of the State",
+    "option_b": "The child is a citizen of Nepal by descent until the father or mother of the child is traced",
+    "option_c": "The child may apply for citizenship only upon attaining majority",
+    "option_d": "Citizenship depends on the district in which the child was found",
+    "correct_option": "B",
+    "explanation": "Article 11 (4): 'Every minor who is found within Nepal and the whereabouts of whose father and mother are not known shall, until the father or the mother of the child is traced, be a citizen of Nepal by descent.'",
+    "difficulty": 2,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-12",
+    "question_text": "After receiving citizenship by descent, Prakash wants his certificate to record his mother's name for gender identity. What does the Constitution allow?",
+    "option_a": "A descent citizen may obtain a certificate of citizenship with gender identity in the name of his or her mother or father",
+    "option_b": "Only the father's name may appear on a citizenship certificate",
+    "option_c": "Adding gender identity to a certificate requires a court order",
+    "option_d": "A person must take citizenship from one parent only and can never change the record",
+    "correct_option": "A",
+    "explanation": "Article 12 (1): a person who obtains citizenship by descent may obtain a certificate of citizenship with gender identity by the name of his or her mother or father.",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-13",
+    "question_text": "A citizen asks how the acquisition, reacquisition and termination of citizenship are regulated. What does the Constitution say?",
+    "option_a": "These matters are decided case-by-case by the district administration",
+    "option_b": "They are as provided for in the Federal law",
+    "option_c": "They are governed by the customary law of each State",
+    "option_d": "Citizenship, once acquired, can never be reacquired or terminated",
+    "correct_option": "B",
+    "explanation": "Article 13 (1): 'Other matters relating to the acquisition, reacquisition and termination of citizenship shall be as provided for in the Federal law.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-14",
+    "question_text": "Ramesh was born in Nepal, later settled in the United States and took American citizenship; his father had been a Nepali citizen by descent. Which of the following applies under the Constitution?",
+    "option_a": "He loses all connection with Nepal and can never regain any form of Nepali citizenship",
+    "option_b": "He may be granted non-resident Nepali citizenship entitling him to economic, social and cultural rights per the Federal law, as he resides outside a SAARC member state",
+    "option_c": "He automatically resumes Nepali citizenship simply by submitting a letter",
+    "option_d": "He can only be considered if he renounces his US passport immediately",
+    "correct_option": "B",
+    "explanation": "Article 14 (1) allows non-resident citizenship to a person who has acquired a foreign citizenship, resides outside a SAARC member state, and whose parent or grandparent was previously a Nepali citizen by descent or birth; the holder may enjoy economic, social and cultural rights in accordance with the Federal law.",
+    "difficulty": 2,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-15",
+    "question_text": "Which statement about citizenship records matches the Constitution?",
+    "option_a": "Every citizen must keep a paper registry maintained by the ward office",
+    "option_b": "The maintenance of records setting out the identity of every citizen is as provided for in the Federal law",
+    "option_c": "Citizenship records are maintained by foreign embassies",
+    "option_d": "The Constitution requires no record-keeping at all",
+    "correct_option": "B",
+    "explanation": "Article 15 (1): 'Other matters relating to the maintenance of records setting out the identity of every citizen of Nepal and the citizenship of Nepal shall be as provided for in the Federal law.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
   }
 ]

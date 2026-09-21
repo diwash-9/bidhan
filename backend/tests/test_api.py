@@ -130,16 +130,24 @@ def test_progress_materializes_rows(auth_user):
 def test_complete_article_bfs_unlock(auth_user):
     uid = auth_user["user_id"]
     set_hearts_full(uid)
-    # Completions are gated on the article quiz; pass every question (correct letter is never leaked).
-    for q in client.get("/api/articles/ART-1/quiz").json():
-        for letter in ("A", "B", "C", "D"):
+    # Completions are gated on the article quiz; answer each question correctly
+    # (one wrong probe per question to learn its correct_option, then the correct try).
+    quiz = client.get("/api/articles/ART-1/quiz").json()
+    assert len(quiz) >= 1
+    for q in quiz:
+        probe = client.post(
+            f"/api/users/{uid}/quiz/{q['id']}/attempt",
+            json={"question_id": q["id"], "selected_option": "A"},
+        )
+        assert probe.status_code == 200, probe.text
+        body = probe.json()
+        if not body["is_correct"]:
             r = client.post(
                 f"/api/users/{uid}/quiz/{q['id']}/attempt",
-                json={"question_id": q["id"], "selected_option": letter},
+                json={"question_id": q["id"], "selected_option": body["correct_option"]},
             )
             assert r.status_code == 200, r.text
-            if r.json()["is_correct"]:
-                break
+            assert r.json()["is_correct"] is True
 
     r = client.post(f"/api/users/{uid}/articles/ART-1/complete")
     assert r.status_code == 200
@@ -148,7 +156,7 @@ def test_complete_article_bfs_unlock(auth_user):
     assert "ART-2" in body["unlocked_targets"]
 
     prog = client.get(f"/api/users/{uid}/progress").json()
-    assert prog["total_xp"] == 35  # 4 questions passed (+20) + article completion (+15)
+    assert prog["total_xp"] == len(quiz) * 5 + 15  # quiz XP + article completion XP
     statuses = {a["article_id"]: a["status"] for a in prog["articles"]}
     assert statuses["ART-1"] == "completed"
     assert statuses["ART-2"] == "unlocked"
