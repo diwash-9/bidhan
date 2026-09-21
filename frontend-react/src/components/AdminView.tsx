@@ -53,7 +53,7 @@ export default function AdminView() {
           <option value="">All parts</option>
           {(parts ?? []).map((p) => (
             <option key={p.part_number} value={p.part_number}>
-              Part {p.part_number} — {p.part_title}
+              Part {p.part_number}: {p.part_title}
             </option>
           ))}
         </select>
@@ -63,7 +63,8 @@ export default function AdminView() {
         <div className="py-16 text-center text-slate-500">Loading articles…</div>
       ) : (
         <div className="bg-slate-900 border-2 border-royal-900 rounded-3xl overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[560px]">
             <thead>
               <tr className="text-left text-slate-400 border-b border-royal-900">
                 <th className="px-4 py-3">ID</th>
@@ -94,6 +95,7 @@ export default function AdminView() {
               ))}
             </tbody>
           </table>
+          </div>
           {!articles?.length && (
             <div className="py-16 text-center text-slate-500 flex flex-col items-center gap-2">
               <FileText className="w-8 h-8" />

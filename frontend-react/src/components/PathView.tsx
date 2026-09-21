@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen,
   Check,
@@ -60,6 +60,26 @@ export default function PathView() {
   const weeklyPct = Math.min(1, weeklyXp / Math.max(1, weeklyGoal))
   const weeklyDone = weeklyXp >= weeklyGoal
 
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useLayoutEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+    const update = () => {
+      const avail = el.clientWidth
+      if (avail > 0) setScale(Math.min(1, avail / TRACK_W))
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    window.addEventListener('resize', update)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [])
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start">
       <aside className="w-full lg:w-64 lg:sticky lg:top-24 shrink-0">
@@ -113,7 +133,7 @@ export default function PathView() {
           </div>
           <p className="text-xs text-slate-400 mt-2">
             {weeklyDone
-              ? 'Quest complete — keep going for more!'
+              ? 'Quest complete. Keep going for more!'
               : 'Earn XP by completing and practising lessons. Ends in '}
             {!weeklyDone && <span className="font-bold text-royal-300">{daysUntilWeekEnd()}</span>}
             {!weeklyDone && ' days.'}
@@ -123,7 +143,9 @@ export default function PathView() {
           </p>
         </div>
 
-        <div className="relative mx-auto" style={{ width: TRACK_W, height: rows.length * ITEM_H }}>
+        <div ref={trackRef} className="w-full">
+        <div className="relative mx-auto" style={{ width: TRACK_W * scale, height: rows.length * ITEM_H * scale }}>
+          <div className="absolute left-0 top-0" style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: TRACK_W, height: rows.length * ITEM_H }}>
           <svg
             aria-hidden="true"
             className="absolute top-0 left-0 pointer-events-none"
@@ -244,6 +266,8 @@ export default function PathView() {
               </div>
             )
           })}
+          </div>
+        </div>
         </div>
       </section>
     </div>

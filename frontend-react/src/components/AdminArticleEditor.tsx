@@ -231,13 +231,13 @@ export default function AdminArticleEditor() {
                   placeholder="Clause text" />
                 <div className="space-y-2 mt-2">
                   {c.sub_clauses.map((s, si) => (
-                    <div key={si} className="flex items-start gap-2">
+                    <div key={si} className="flex items-start gap-2 flex-wrap">
                       <input value={s.identifier}
                         onChange={(e) => patchSubClause(ci, si, { identifier: e.target.value })}
                         className="w-14 bg-slate-950 border border-royal-900 rounded-lg px-2 py-1.5 text-sm outline-none focus:border-crimson-500" aria-label="Sub-clause identifier" />
                       <input value={s.content}
                         onChange={(e) => patchSubClause(ci, si, { content: e.target.value })}
-                        className="flex-1 bg-slate-950 border border-royal-900 rounded-lg px-2 py-1.5 text-sm outline-none focus:border-crimson-500" aria-label="Sub-clause content" />
+                        className="flex-1 min-w-[180px] bg-slate-950 border border-royal-900 rounded-lg px-2 py-1.5 text-sm outline-none focus:border-crimson-500" aria-label="Sub-clause content" />
                       <button
                         onClick={() => patchClause(ci, { sub_clauses: c.sub_clauses.filter((_, i) => i !== si) })}
                         className="text-slate-500 hover:text-red-400 transition p-1" aria-label="Remove sub-clause">
@@ -267,7 +267,7 @@ export default function AdminArticleEditor() {
           </div>
           <div className="space-y-2">
             {draft.dependencies.map((dep, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={i} className="flex flex-wrap items-center gap-2">
                 <input value={dep.target_id}
                   onChange={(e) => patchDependency(i, { target_id: e.target.value })}
                   className="w-32 bg-slate-950 border border-royal-900 rounded-lg px-2 py-1.5 text-sm outline-none focus:border-crimson-500"

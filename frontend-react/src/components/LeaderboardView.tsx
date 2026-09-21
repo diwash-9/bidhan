@@ -48,7 +48,7 @@ export default function LeaderboardView() {
       <p className="text-sm text-slate-400 mb-5">
         {window === 'week' ? (
           <>
-            Top learners this week — ends in <span className="font-bold text-royal-300">{daysUntilWeekEnd()}</span> day{daysUntilWeekEnd() > 1 ? 's' : ''}.
+            Top learners this week. Ends in <span className="font-bold text-royal-300">{daysUntilWeekEnd()}</span> day{daysUntilWeekEnd() > 1 ? 's' : ''}.
           </>
         ) : (
           'Best all-time learners on विधान Bidhan.'
@@ -56,7 +56,7 @@ export default function LeaderboardView() {
       </p>
 
       {rows.length === 0 && (
-        <p className="py-10 text-center text-slate-500">No entries yet — complete a lesson to join the race!</p>
+        <p className="py-10 text-center text-slate-500">No entries yet. Complete a lesson to join the race!</p>
       )}
 
       <div className="space-y-2">

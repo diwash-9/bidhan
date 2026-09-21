@@ -14,11 +14,11 @@ export default function ProfileView() {
 
   return (
     <div>
-      <div className="bg-slate-900 border-2 border-royal-900 rounded-3xl p-6 mb-6 max-w-4xl mx-auto">
+      <div className="bg-slate-900 border-2 border-royal-900 rounded-3xl p-4 sm:p-6 mb-6 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold mb-1 font-display">{progress.display_name}</h2>
         <p className="text-sm text-slate-400 mb-6">Your विधान Bidhan journey</p>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
           <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 text-center">
             <Flame className="w-6 h-6 mx-auto text-orange-500 fill-orange-500 mb-1" />
             <div className="font-bold text-2xl">{progress.current_streak}</div>

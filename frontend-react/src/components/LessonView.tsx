@@ -192,7 +192,7 @@ export default function LessonView() {
   )
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl max-w-4xl mx-auto">
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl max-w-4xl mx-auto">
       <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 text-sm font-semibold transition">
         <ArrowLeft className="w-4 h-4" /> Back to Path
       </Link>
@@ -205,7 +205,7 @@ export default function LessonView() {
         <p className="text-xs text-slate-400 mt-1">{article.part_title}</p>
         {isPractice && (
           <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-royal-300 bg-royal-900/40 border border-royal-800 rounded-full px-3 py-1">
-            <RotateCcw className="w-3 h-3" /> Practice mode — +4 XP per correct answer, no hearts used
+            <RotateCcw className="w-3 h-3" /> Practice mode: +4 XP per correct answer, no hearts used
           </span>
         )}
       </div>
@@ -227,7 +227,7 @@ export default function LessonView() {
               <Sparkles className="w-5 h-5" /> Start Knowledge Check
             </button>
             <p className="text-xs text-slate-500 text-center mt-3">
-              The article is hidden during the check — re-opening it costs <Heart className="w-3 h-3 inline text-crimson-500 fill-crimson-500" /> 1.
+              The article is hidden during the check; re-opening it costs <Heart className="w-3 h-3 inline text-crimson-500 fill-crimson-500" /> 1.
             </p>
           </div>
         </>
@@ -275,7 +275,7 @@ export default function LessonView() {
                   <EyeOff className="w-4 h-4" /> Hide article
                 </button>
                 <span className="text-xs text-slate-500">
-                  {isPractice ? 'Toggle freely — you are only practising.' : 'Re-opening while quizzing costs another heart.'}
+                  {isPractice ? 'Toggle freely. You are only practising.' : 'Re-opening while quizzing costs another heart.'}
                 </span>
               </div>
               {renderArticle()}
@@ -284,11 +284,11 @@ export default function LessonView() {
 
           {!finished && current && (
             <>
-              <p className="text-slate-200 font-medium mb-4">
+              <p className="text-slate-200 font-medium mb-4 break-words">
                 <span className="text-xs font-bold text-slate-500 mr-2">{currentIdx + 1}.</span>
                 {current.question_text}
               </p>
-              <div key={shakes} className={`grid gap-3 ${wrongLatest ? 'animate-shake' : ''}`}>
+              <div key={shakes} className={`grid gap-2 sm:gap-3 ${wrongLatest ? 'animate-shake' : ''}`}>
                 {(['A', 'B', 'C', 'D'] as const).map((opt) => {
                   const text = current[`option_${opt.toLowerCase()}` as keyof typeof current] as string
                   let style = 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -326,12 +326,12 @@ export default function LessonView() {
                   >
                     {answered.is_correct ? (
                       <span className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 shrink-0" /> +{answered.xp_earned} XP — {answered.explanation}
+                        <CheckCircle className="w-4 h-4 shrink-0" /> +{answered.xp_earned} XP: {answered.explanation}
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
                         <XCircle className="w-4 h-4 shrink-0" />
-                        {isPractice ? 'Not quite — keep trying!' : `-1 ${'♥'} — ${answered.explanation}`}
+                        {isPractice ? 'Not quite. Keep trying!' : `-1 ${'♥'}: ${answered.explanation}`}
                       </span>
                     )}
                   </div>
@@ -344,7 +344,7 @@ export default function LessonView() {
                     </button>
                   ) : (
                     <p className="mt-3 text-center text-xs text-slate-400">
-                      Not quite — pick another option to try again.
+                      Not quite. Pick another option to try again.
                     </p>
                   )}
                 </div>

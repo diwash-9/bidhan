@@ -27,8 +27,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6">
-      <div className="w-full max-w-md bg-slate-900 border-2 border-royal-900 rounded-3xl p-8 shadow-2xl">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4 sm:px-6">
+      <div className="w-full max-w-md bg-slate-900 border-2 border-royal-900 rounded-3xl p-6 sm:p-8 shadow-2xl">
         <div className="text-center mb-8">
           <div className="inline-flex bg-crimson-600/15 p-3 rounded-2xl border border-crimson-500/30 font-bold text-2xl mb-3">
             🇳🇵
