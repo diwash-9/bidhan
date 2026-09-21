@@ -1,24 +1,24 @@
-﻿# à¤µà¤¿à¤§à¤¾à¤¨ Bidhan ðŸ‡³ðŸ‡µ
+# विधान Bidhan 🇳🇵
 
-An interactive, gamified learning platform for the **Constitution of Nepal** (English translation) â€” built Duolingo-style. Work through 308 articles across 35 parts via a branching learning path, read structured lessons (articles â†’ clauses â†’ sub-clauses), and prove your knowledge with graded quizzes.
+An interactive, gamified learning platform for the **Constitution of Nepal** (English translation): built Duolingo-style. Work through 308 articles across 35 parts via a branching learning path, read structured lessons (articles → clauses → sub-clauses), and prove your knowledge with graded quizzes.
 
-**Stack:** React Â· TypeScript Â· Vite Â· Tailwind CSS Â· FastAPI Â· SQLAlchemy 2.0 Â· PostgreSQL Â· Docker
+**Stack:** React · TypeScript · Vite · Tailwind CSS · FastAPI · SQLAlchemy 2.0 · PostgreSQL · Docker
 
 ---
 
 ## Features
 
-- **Full constitution content** â€” all 308 articles parsed into parts, articles, clauses, and sub-clauses.
-- **Branching learning path** â€” articles unlock along a dependency graph (not a linear line).
-- **Graded quizzes** â€” quality question bank with explanations and difficulty levels.
-- **Scenario questions** â€” real-life application questions (new `scenario` knowledge type) alongside recall/comprehension; authored in `db/scenario_questions.json` and synced into the DB with `python -m app.db.sync_quiz`.
-- **Healthy gameplay loop** â€” 10 hearts, refill 1 every 30 minutes (live countdown in the header); **you're blocked once you run out**. Lessons are two-phase: read the article, then take a hidden-article knowledge check â€” re-opening the article mid-quiz costs a heart.
-- **Gamification** â€” XP, streaks, hearts/lives, leagues, badges, sound, and celebrations.
-- **Practice mode** â€” replay any completed lesson for reduced XP (+4/question, zero heart cost) to keep your weekly quest going.
-- **Weekly quest & leaderboard** â€” a 100 XP weekly goal with a live progress bar on the path, plus a weekly-first leaderboard (This Week / All-Time toggle).
-- **User accounts** â€” secure signup/login with JWT sessions and per-user progress.
-- **Instant search** â€” full-text search across article titles and content.
-- **Content admin** â€” role-gated admin panel to edit articles, clauses, dependencies and quiz questions; every save records an audited amendment (snapshot + effective date/act).
+- **Full constitution content**: all 308 articles parsed into parts, articles, clauses, and sub-clauses.
+- **Branching learning path**: articles unlock along a dependency graph (not a linear line).
+- **Graded quizzes**: quality question bank with explanations and difficulty levels.
+- **Scenario questions**: real-life application questions (new `scenario` knowledge type) alongside recall/comprehension; authored in `db/scenario_questions.json` and synced into the DB with `python -m app.db.sync_quiz`.
+- **Healthy gameplay loop**: 10 hearts, refill 1 every 30 minutes (live countdown in the header); **you're blocked once you run out**. Lessons are two-phase: read the article, then take a hidden-article knowledge check: re-opening the article mid-quiz costs a heart.
+- **Gamification**: XP, streaks, hearts/lives, leagues, badges, sound, and celebrations.
+- **Practice mode**: replay any completed lesson for reduced XP (+4/question, zero heart cost) to keep your weekly quest going.
+- **Weekly quest & leaderboard**: a 100 XP weekly goal with a live progress bar on the path, plus a weekly-first leaderboard (This Week / All-Time toggle).
+- **User accounts**: secure signup/login with JWT sessions and per-user progress.
+- **Instant search**: full-text search across article titles and content.
+- **Content admin**: role-gated admin panel to edit articles, clauses, dependencies and quiz questions; every save records an audited amendment (snapshot + effective date/act).
 
 ## Quickstart
 
@@ -81,7 +81,7 @@ CI runs lint, tests, builds, and container images automatically via GitHub Actio
 
 ## License
 
-MIT â€” see [LICENSE](LICENSE).
+MIT: see [LICENSE](LICENSE).
 
 ---
 
