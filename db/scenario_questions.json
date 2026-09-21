@@ -682,5 +682,65 @@
   "explanation": "Article 55 (1): 'No question shall be raised in any court as to whether any matter contained in this Part has been implemented or not.' The directive principles are guiding and non-justiciable, in contrast to the enforceable fundamental rights of Part 3.",
   "difficulty": 2,
   "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-56",
+  "question_text": "A provincial minister claims that the Province is fully sovereign and may refuse to follow the Constitution whenever its provincial law says otherwise, and that the local level is merely a department of the Province. Under the Constitution:",
+  "option_a": "The main structure of the State has three levels — Federation, State and Local — all of which exercise the power of State of Nepal pursuant to the Constitution and law",
+  "option_b": "The Federation alone holds State power and the other levels are advisory",
+  "option_c": "Each level is sovereign and may act independently of the Constitution",
+  "option_d": "The local level is directly subordinate to the Federation, not the Province",
+  "correct_option": "A",
+  "explanation": "Article 56 (1) fixes the main structure at three levels — the Federation, the State and the Local level; clause (2) provides that all three levels exercise the power of State of Nepal pursuant to this Constitution and law, and clause (6) makes all levels jointly protect the federal democratic republic and its institutions.",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-57",
+  "question_text": "The State Assembly of a province enacts a law on a State-list (Schedule-6) matter that contradicts an existing Federal law on the same subject. What happens under the Constitution?",
+  "option_a": "The State law prevails over the Federal law within the province",
+  "option_b": "The State law is invalid to the extent of its inconsistency with the Federal law, because State laws under the concurrent lists must not be inconsistent with Federal law",
+  "option_c": "A State referendum decides which law operates",
+  "option_d": "Both laws remain fully valid and courts choose case-by-case",
+  "correct_option": "B",
+  "explanation": "Article 57 (6) provides that any law made by the State Assembly under the concurrent lists must not be inconsistent with Federal law and that a State law which is inconsistent with the Federal law is invalid to the extent of such inconsistency.",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-58",
+  "question_text": "A field of policy activity appears in none of the Federal list (Schedule-5), State list (Schedule-6), Local list (Schedule-8) or the concurrent lists. Which level of government has power over it?",
+  "option_a": "The Local level, as the closest to the people",
+  "option_b": "The State level, by a resolution of all provinces acting jointly",
+  "option_c": "No level may act until the Constitution is amended",
+  "option_d": "The Federation, which has power over any matter not enumerated in the Federal, State, Local or Concurrent lists, or not otherwise specified in the Constitution",
+  "correct_option": "D",
+  "explanation": "Article 58 (1): 'The Federation shall have power on any matter not enumerated in the Federal List, State List, List of Local level or Concurrent List or on any matter which is not so specified in this Constitution as to be exercised by any level.'",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-59",
+  "question_text": "A hydropower dam is built on a river flowing through a district, and the affected local communities say they should receive a share of the benefits. Under the Constitution:",
+  "option_a": "The Federation, State and Local level shall provide for equitable distribution of benefits derived from natural resources or development, with specified portions distributed by law as royalty, services or goods to project-affected regions and local communities",
+  "option_b": "All benefits belong solely to the private developer that holds the licence",
+  "option_c": "Only the Federation and Province receive benefits, never local communities",
+  "option_d": "Communities receive benefits only if they first made an investment",
+  "correct_option": "A",
+  "explanation": "Article 59 (4) requires the Federation, State and Local level to provide for equitable distribution of benefits from the use of natural resources or development, distributing certain portions by law as royalty, services or goods to the project-affected regions and local communities; clause (5) requires priority for local-community investment.",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
+ },
+ {
+  "article_id": "ART-60",
+  "question_text": "A provincial government asks how much fiscal transfer it should receive from the Centre and on what basis that amount is fixed. Under the Constitution:",
+  "option_a": "The amount of fiscal transfer receivable by the State and Local level is as recommended by the National Natural Resources and Fiscal Commission, with distribution among the three levels made in a balanced and transparent manner",
+  "option_b": "The provincial government fixes its own transfer at whatever sum it enacts",
+  "option_c": "The Federation gives an equal, fixed sum to every province regardless of need",
+  "option_d": "Transfers depend entirely on a private negotiation with the Centre each year",
+  "correct_option": "A",
+  "explanation": "Article 60 (2)-(3) require the Government of Nepal to make equitable distribution of collected revenue, with the amount of fiscal transfer receivable by the State and Local level as recommended by the National Natural Resources and Fiscal Commission; clause (7) requires balanced and transparent distribution.",
+  "difficulty": 2,
+  "knowledge_type": "scenario"
  }
 ]
