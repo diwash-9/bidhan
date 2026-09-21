@@ -181,7 +181,7 @@ def generate_quizzes_for_all_articles():
         dist = _distinct_options(art["title"], all_titles, 3)
         opts = _options_tuple(art["title"], dist)
         qtext = (
-            f"The quoted text — '{quote}' — appears in which Article of the Constitution of Nepal?"
+            f"The quoted text, '{quote}', appears in which Article of the Constitution of Nepal?"
         )
         store_question(
             cursor, art["id"], qtext, opts,

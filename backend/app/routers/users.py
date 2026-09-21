@@ -118,7 +118,7 @@ def attempt_question(
     if hearts.hearts_left <= 0:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You're out of hearts — wait for a refill before continuing",
+            detail="You're out of hearts: wait for a refill before continuing",
         )
     result = grade_answer(db, user_id, submission)
     if result.is_correct:

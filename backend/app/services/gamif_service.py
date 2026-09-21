@@ -116,7 +116,7 @@ def charge_heart(db: Session, user_id: str) -> Hearts:
     if hearts.hearts_left <= 0:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You're out of hearts — wait for a refill before continuing",
+            detail="You're out of hearts: wait for a refill before continuing",
         )
     hearts.hearts_left -= 1
     if not hearts.last_refill_ts:
