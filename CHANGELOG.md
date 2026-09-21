@@ -23,6 +23,19 @@ Gameplay loop tightened to feel like Duolingo: a quest, a competition, and a way
 - Live end-to-end (local Postgres + uvicorn + Vite proxy): register → complete ART-1 (35 XP, hearts untouched) → practice (+4 XP, hearts still full) → weekly quest + weekly leaderboard reflect the earned XP.
 - The React Query retry storm against a freshly-restarted backend no longer trip-wires the rate limiter into a prolonged 500 spiral.
 
+## [Unreleased] — Scenario knowledge-test questions (pilot: Part 1)
+
+Knowledge tests move beyond pure recitation by adding relatable, real-life application questions alongside the existing recall/comprehension types.
+
+### Added
+- **Authored scenario bank** — `db/scenario_questions.json` (versioned, 9 questions for Part 1, Preliminary, ART-1…ART-9). Each question grounds a realistic situation in the actual clause text, with plain-language distractors and an explanation quoting the provision.
+- **Sync loader** — `python -m app.db.sync_quiz` upserts scenario rows into Postgres matched by `(article_id, question_text)`: inserts new, updates existing, **never deletes** — quiz-attempt foreign keys stay valid across refreshes. Source override via `SCENARIO_FILE`.
+- **Admin UI** — knowledge-type dropdown in the question editor now lists the real types (`article_subject`, `clause_text`, `quote_match`, `scenario`).
+- **Tests** — `backend/tests/test_sync_quiz.py` (5): pilot-file structure validity, referenced articles exist, sync idempotency (same rows/IDs on re-run), update path writes fields, and attempts survive a re-sync. Suite: **36 tests passing**, `ruff` clean.
+
+### Verified
+- Live end-to-end: ART-1 quiz now serves 5 questions (4 recall + 1 scenario); answering the scenario returns correct/`+5 XP` with the quoted explanation; sync re-run is a no-op.
+
 ---
 
 For earlier work see the `git log` (Phase 1–6: project foundation, Postgres content/migrations, modular FastAPI backend, TypeScript frontend, Docker Compose + CI, and the role-gated content-admin + hearts rework).

@@ -341,7 +341,9 @@ export default function AdminArticleEditor() {
                       onChange={(e) => patchQuiz(qi, { knowledge_type: e.target.value })}
                       className="bg-slate-950 border border-royal-900 rounded-lg px-2 py-1.5 outline-none">
                       <option value="article_subject">article_subject</option>
-                      <option value="case_law">case_law</option>
+                      <option value="clause_text">clause_text</option>
+                      <option value="quote_match">quote_match</option>
+                      <option value="scenario">scenario</option>
                     </select>
                   </label>
                 </div>

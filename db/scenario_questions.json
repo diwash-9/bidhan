@@ -1,0 +1,110 @@
+[
+  {
+    "article_id": "ART-1",
+    "question_text": "A municipal assembly passes a by-law that directly contradicts a provision of the Constitution. According to the Constitution, what happens to that by-law?",
+    "option_a": "It remains fully valid until the Supreme Court reviews every by-law.",
+    "option_b": "It is void to the extent of its inconsistency with the Constitution.",
+    "option_c": "It automatically amends the Constitution.",
+    "option_d": "It stands because the majority of the assembly voted for it.",
+    "correct_option": "B",
+    "explanation": "Article 1 (1): 'This Constitution is the fundamental law of Nepal. Any law inconsistent with this Constitution shall, to the extent of such inconsistency, be void.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-2",
+    "question_text": "At a debate, a speaker claims that all state power should belong to the elected cabinet rather than to the people. Under the Constitution, in whom is the sovereignty and state authority of Nepal vested?",
+    "option_a": "In the Prime Minister and the Council of Ministers",
+    "option_b": "In the Federal Parliament",
+    "option_c": "In the Nepalese people",
+    "option_d": "In the Supreme Court",
+    "correct_option": "C",
+    "explanation": "Article 2 (1): 'The sovereignty and state authority of Nepal shall be vested in the Nepalese people. It shall be exercised in accordance with the provisions set forth in this Constitution.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-3",
+    "question_text": "A student argues that only Nepali-speaking citizens form the Nepalese nation. Which description of the nation matches the Constitution?",
+    "option_a": "Only citizens who speak the official language",
+    "option_b": "Only people living in the federal districts",
+    "option_c": "Everyone who holds a Nepali passport, wherever they live",
+    "option_d": "All Nepalese people across ethnicities, languages, religions, cultures and geographical diversities, united by allegiance to national independence, territorial integrity, national interest and prosperity",
+    "correct_option": "D",
+    "explanation": "Article 3 (1): 'All the Nepalese people, with multiethnic, multilingual, multi-religious, multicultural characteristics and in geographical diversities, and having common aspirations and being united by a bond of allegiance to national independence, territorial integrity, national interest and prosperity of Nepal, collectively constitute the nation.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-4",
+    "question_text": "A pundit suggests Nepal should sell a portion of its border territory to settle foreign debt. What does the Constitution say about Nepal's status?",
+    "option_a": "Nepal is an independent, indivisible, sovereign, secular, inclusive, democratic, socialism-oriented, federal democratic republican state",
+    "option_b": "Nepal is a secular republic that may cede territory by a two-thirds vote of Parliament",
+    "option_c": "Nepal is a federal state whose provinces may transfer territory with their consent",
+    "option_d": "Nepal is an independent kingdom; territory changes need only royal approval",
+    "correct_option": "A",
+    "explanation": "Article 4 (1): 'Nepal is an independent, indivisible, sovereign, secular, inclusive, democratic, socialism-oriented, federal democratic republican state.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-5",
+    "question_text": "A border official is caught leaking security maps to a foreign agent for money. Under the Constitution, what happens to conduct that is contrary to the national interest?",
+    "option_a": "It is tolerated as a private matter between the official and the agent",
+    "option_b": "It is punishable by Federal law",
+    "option_c": "It is governed only by the laws of the concerned State",
+    "option_d": "It becomes legal if the official apologises and returns the money",
+    "correct_option": "B",
+    "explanation": "Article 5 (2): 'Any conduct and act contrary to the national interest shall be punishable by the Federal law.' Article 5 (1) lists freedom, sovereignty, territorial integrity, nationality, independence and dignity of Nepal, the rights of the Nepalese people, border security and economic wellbeing and prosperity as the basic elements of national interest.",
+    "difficulty": 2,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-6",
+    "question_text": "Which statement about the languages of Nepal matches the Constitution?",
+    "option_a": "Only Nepali is a language of the nation",
+    "option_b": "All languages spoken as mother tongues in Nepal are languages of the nation",
+    "option_c": "Only languages with an established written literature count",
+    "option_d": "Only the languages used in official government work count",
+    "correct_option": "B",
+    "explanation": "Article 6 (1): 'All languages spoken as the mother tongues in Nepal are the languages of the nation.' This is about recognition, not official use (official language is governed by Article 7).",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-7",
+    "question_text": "A Province whose residents largely speak Maithili wants to use Maithili in its official work in addition to Nepali. What does the Constitution allow?",
+    "option_a": "Nothing - only the Nepali language in Devnagari script may be used officially anywhere",
+    "option_b": "The Province may, by a State law, determine one or more languages of the nation spoken by a majority within the State as its additional official language(s)",
+    "option_c": "The Language Commission alone may declare official languages without any law",
+    "option_d": "Only the Federal Parliament may choose a Province's official languages",
+    "correct_option": "B",
+    "explanation": "Article 7 (1) makes Nepali in the Devnagari script the official language. Article 7 (2) lets a State determine, by a State law, one or more languages of the nation spoken by a majority within the State as additional official language(s).",
+    "difficulty": 2,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-8",
+    "question_text": "You are designing a poster of the national flag. Which shape and design matches the Constitutional description?",
+    "option_a": "Two juxtaposed triangular figures with a crimson-coloured base and deep blue borders, a white crescent moon with eight visible rays above and a white twelve-rayed sun below",
+    "option_b": "A single rectangular crimson banner with a deep blue border and a white star in the centre",
+    "option_c": "A triangular crimson flag with a white lion emblem and olive branches",
+    "option_d": "A round crimson emblem with a white bird and gold border",
+    "correct_option": "A",
+    "explanation": "Article 8 (1): 'The national flag of Nepal consists of two juxtaposed triangular figures with a crimson-coloured base and deep blue borders, there being a white emblem of the crescent moon with eight rays visible out of sixteen in the upper part and a white emblem of a twelve rayed sun in the lower part.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  },
+  {
+    "article_id": "ART-9",
+    "question_text": "A school textbook lists Nepal's national symbols. Which line is correct according to the Constitution?",
+    "option_a": "National flower - Rhododendron Arboreum; national colour - crimson; national animal - Cow; national bird - Lophophorus",
+    "option_b": "National flower - Orchid; national colour - saffron; national animal - Elephant; national bird - Peacock",
+    "option_c": "National flower - Lotus; national colour - white; national animal - Tiger; national bird - Eagle",
+    "option_d": "National flower - Marigold; national colour - green; national animal - Yak; national bird - Sparrow",
+    "correct_option": "A",
+    "explanation": "Article 9 (3): 'The Rhododendron Arboreum shall be the national flower, Crimson Colour shall be the national colour, the Cow shall be the national animal and the Lophophorus shall be the national bird of Nepal.'",
+    "difficulty": 1,
+    "knowledge_type": "scenario"
+  }
+]
