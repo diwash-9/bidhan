@@ -11,6 +11,7 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 - **Full constitution content** — all 308 articles parsed into parts, articles, clauses, and sub-clauses.
 - **Branching learning path** — articles unlock along a dependency graph (not a linear line).
 - **Graded quizzes** — quality question bank with explanations and difficulty levels.
+- **Scenario questions** — real-life application questions (new `scenario` knowledge type) alongside recall/comprehension; authored in `db/scenario_questions.json` and synced into the DB with `python -m app.db.sync_quiz`.
 - **Healthy gameplay loop** — 10 hearts, refill 1 every 30 minutes (live countdown in the header); **you're blocked once you run out**. Lessons are two-phase: read the article, then take a hidden-article knowledge check — re-opening the article mid-quiz costs a heart.
 - **Gamification** — XP, streaks, hearts/lives, leagues, badges, sound, and celebrations.
 - **Practice mode** — replay any completed lesson for reduced XP (+4/question, zero heart cost) to keep your weekly quest going.

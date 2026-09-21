@@ -293,7 +293,7 @@ export default function LessonView() {
                   const text = current[`option_${opt.toLowerCase()}` as keyof typeof current] as string
                   let style = 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
                   if (answered) {
-                    if (opt === answered.correct_option) style = 'bg-crimson-600/20 border-crimson-500 text-crimson-300'
+                    if (opt === answered.correct_option) style = 'bg-royal-500/20 border-royal-500 text-royal-300'
                     else if (opt === answered.selected_option) style = 'bg-slate-800 border-slate-600 text-slate-500 line-through'
                     else style = 'bg-slate-950 border-slate-800 text-slate-500'
                   }
