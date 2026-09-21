@@ -47,6 +47,10 @@
   animation: pop-in 0.35s ease-out both;
 }
 
+.correct {
+  animation: pop-in 0.35s ease-out both;
+}
+
 @keyframes shake-x {
   0%,
   100% {

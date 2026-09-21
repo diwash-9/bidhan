@@ -293,7 +293,7 @@ export default function LessonView() {
                   const text = current[`option_${opt.toLowerCase()}` as keyof typeof current] as string
                   let style = 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
                   if (answered) {
-                    if (opt === answered.correct_option) style = 'bg-royal-500/20 border-royal-500 text-royal-300'
+                    if (opt === answered.correct_option) style = 'correct bg-royal-500/20 border-royal-500 text-royal-300'
                     else if (opt === answered.selected_option) style = 'bg-slate-800 border-slate-600 text-slate-500 line-through'
                     else style = 'bg-slate-950 border-slate-800 text-slate-500'
                   }
@@ -305,7 +305,7 @@ export default function LessonView() {
                       aria-pressed={answered?.selected_option === opt}
                       className={`p-3 rounded-xl text-left text-sm font-semibold transition border ${style} disabled:cursor-not-allowed`}
                     >
-                      <span className="inline-flex items-center justify-center w-6 h-6 mr-3 rounded-lg bg-slate-800/80 text-xs font-bold border border-slate-700">
+                      <span className={`inline-flex items-center justify-center w-6 h-6 mr-3 rounded-lg bg-slate-800/80 text-xs font-bold border border-slate-700 ${opt === answered?.correct_option ? 'correct' : ''}`}>
                         {opt}
                       </span>
                       {text}
