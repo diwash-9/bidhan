@@ -42,7 +42,7 @@ services:
     branch: main
     rootDir: frontend-react
     buildCommand: npm ci && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE
         value: https://bidhan-api.onrender.com/api
