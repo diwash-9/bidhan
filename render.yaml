@@ -11,9 +11,8 @@
 #
 # Service names must be globally unique on Render; rename the two services below if a
 # name is taken and mirror that change in CORS_ORIGINS / VITE_API_BASE.
-
 services:
-  # --- FastAPI backend (long-running web service; Docker build) ---
+  # --- FastAPI backend ---
   - type: web
     name: bidhan-api
     runtime: docker
@@ -33,11 +32,10 @@ services:
       - key: LOG_LEVEL
         value: info
 
-  # --- React SPA (static build, served from CDN) ---
+  # --- React SPA ---
   - type: web
     name: bidhan-frontend
     runtime: static
-    plan: free
     branch: main
     rootDir: frontend-react
     buildCommand: npm ci && npm run build
