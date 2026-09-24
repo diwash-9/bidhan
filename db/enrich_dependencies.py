@@ -36,7 +36,6 @@ def build_graph():
 
     art_text = {}
     for part in parts:
-        part_no = str(part.get("part_no"))
         arts = [str(a.get("article_no")) for a in part.get("articles", [])]
         part_articles.append(arts)
         for a in part.get("articles", []):
@@ -62,9 +61,11 @@ def build_graph():
     rank = 0
     for s, t in ordered_edges:
         if s not in order:
-            order[s] = rank; rank += 1
+            order[s] = rank
+            rank += 1
         if t not in order:
-            order[t] = rank; rank += 1
+            order[t] = rank
+            rank += 1
 
     # 2) Add text references ONLY where they respect the skeleton order
     #    (referenced article must come before the referencing article).

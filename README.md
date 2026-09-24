@@ -23,13 +23,15 @@ An interactive, gamified learning platform for the **Constitution of Nepal** (En
 ## Quickstart
 
 ### The Easiest Way (Docker)
-Simply double-click **`run.bat`** (or run `run.bat` in your terminal). 
-This will automatically build and start the database, backend, and frontend.
+Simply run from the project root: **`docker compose up --build -d`** (or double-click
+**`scripts/run.bat`** on Windows). This will automatically build and start the database,
+backend, and frontend.
 
 - **Frontend App:** [http://localhost:5173](http://localhost:5173)
 - **Backend API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
-To stop the app, run **`stop.bat`** or `docker compose down`.
+To stop the app, run **`stop.bat`** (in `scripts/`) or `docker compose down`.
+See `scripts/SHARING.md` for exposing a local instance over the internet.
 
 ---
 
@@ -53,10 +55,11 @@ questions from the in-app **Admin** tab (visible to admins only, or `/admin`).
 ## Project Structure
 
 ```text
-backend/          FastAPI app (routers, services, schemas, models, migrations)
+backend/          FastAPI app (routers, services, schemas, models, migrations, tests)
 frontend-react/   React + TypeScript SPA
-db/               legacy content/seed scripts
+db/               content store & pipeline (constitution.db seed data, scenario quiz JSON, parser toolkit)
 data/             raw constitution source (JSON, PDF)
+scripts/          Windows helper scripts (run/stop .bat, SHARING.md)
 ```
 
 ## Running the tests and checks

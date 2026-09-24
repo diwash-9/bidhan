@@ -9,10 +9,6 @@ htmlcov/
 venv/
 env/
 
-# --- Regenerable build artifacts ---
-db/constitution.db
-db/*.db
-
 # --- Environment & secrets (private) ---
 .env
 .env.*
