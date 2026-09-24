@@ -25,7 +25,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
-        sync: false  # paste the Neon connection string in the Render dashboard
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
@@ -33,12 +33,11 @@ services:
       - key: LOG_LEVEL
         value: info
 
-  # --- React SPA (static build, served from a CDN - never spins down) ---
+  # --- React SPA (static build, served from CDN) ---
   - type: web
     name: bidhan-frontend
     runtime: static
     plan: free
-    region: oregon
     branch: main
     rootDir: frontend-react
     buildCommand: npm ci && npm run build
