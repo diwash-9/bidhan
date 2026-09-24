@@ -1,0 +1,24 @@
+# Keep the free Render API warm so it doesn't spin down after 15 min of idle.
+#
+# Render's free Web Service slots consume ~720-744 h/month when kept awake 24/7,
+# which stays under the 750 free instance-hour cap. The frontend is a static site
+# (CDN) and needs no pinging.
+#
+# Optional: add a second, external free pinger (UptimeRobot or cron-job.org, every
+# 10-14 min against https://bidhan-api.onrender.com/api/health) for extra reliability.
+
+name: keep-alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Render API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend health endpoint
+        run: curl -sS -o /dev/null -w "api health HTTP %{http_code}\n" "https://bidhan-api.onrender.com/api/health"
+        timeout-minutes: 5

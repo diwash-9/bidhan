@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,6 +9,17 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/constitution"
+
+    @field_validator("database_url")
+    @classmethod
+    def normalize_database_url(cls, v: str) -> str:
+        # Managed providers (e.g. Render) hand out `postgresql://` connection strings
+        # without a driver; SQLAlchemy needs `postgresql+psycopg://`.
+        if v.startswith("postgres://"):
+            v = "postgresql+psycopg://" + v[len("postgres://") :]
+        elif v.startswith("postgresql://"):
+            v = "postgresql+psycopg://" + v[len("postgresql://") :]
+        return v
 
     # Auth
     jwt_secret: str = "dev-only-change-me-in-production-super-secret-key-0123456789abcdef"

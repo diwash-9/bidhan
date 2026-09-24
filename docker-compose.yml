@@ -17,14 +17,13 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/constitution
       JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-in-production-super-secret-key-0123456789abcdef}
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
       LOG_LEVEL: info
-    volumes:
-      - ./db/constitution.db:/data/constitution.db:ro
     depends_on:
       db:
         condition: service_healthy

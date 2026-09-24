@@ -1,0 +1,22 @@
+# Root dockerignore (backend image builds with repo root as context).
+# Keep only what the backend image needs: source, migrations, content DB.
+
+.git
+.github
+.project-docs
+.venv
+.venv/
+node_modules/
+**/__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+*.egg-info
+.env
+.env.*
+!.env.example
+backend/tests
+frontend-react
+scripts
+data
+db/*.json

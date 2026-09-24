@@ -74,13 +74,51 @@ cd frontend-react && npm run typecheck && npm run lint && npm run build
 
 ## Deployment
 
-Docker-based deployment is provided (API + web + PostgreSQL):
+### Local (Docker Compose)
 
 ```bash
 docker compose up --build
 ```
 
 CI runs lint, tests, builds, and container images automatically via GitHub Actions.
+
+### Production (Render + Neon)
+
+The **FastAPI web service** and the **React SPA** are defined in [`render.yaml`](render.yaml)
+as a Render Blueprint. The database is a durable free **Neon** Postgres (Render's own free
+Postgres is wiped after 30 days).
+
+1. Push the `main` branch to GitHub (repo: `diwash-9/bidhan`).
+2. Render dashboard → **New → Blueprint** → connect this repo → **Apply** — this deploys:
+   - API: `https://bidhan-api.onrender.com` (`/docs` for the API explorer)
+   - App: `https://bidhan-frontend.onrender.com`
+
+3. **Connect the database** (one-time, ~2 minutes):
+   - Create a free project at [neon.tech](https://neon.tech) and copy its connection string
+     (e.g. `postgresql://user:pass@ep-xxx.region.neon.tech/constitution?sslmode=require`).
+   - In the Render dashboard → `bidhan-api` → **Environment** → set `DATABASE_URL` to it.
+   - Re-deploy `bidhan-api` (or push to `main`); startup runs `alembic upgrade head` + seed
+     automatically. The backend also accepts bare `postgres://`/`postgresql://` URLs and
+     normalizes them to the `psycopg` driver.
+
+Other wiring is automatic:
+
+- `JWT_SECRET` is auto-generated; `CORS_ORIGINS` + `VITE_API_BASE` point the SPA at the API.
+- The content DB (`db/constitution.db`) is baked into the backend image, so no extra steps.
+
+Notes:
+
+- Render service names must be **globally unique** — if `bidhan-api`/`bidhan-frontend` are
+  taken, rename them in `render.yaml` and update `CORS_ORIGINS` / `VITE_API_BASE` to match
+  (and the ping target in `.github/workflows/keep-alive.yml`).
+- **Keeping the API awake for free:** free Web Services spin down after 15 min without
+  traffic (first request after idle takes ~1 min). The repo ships a GitHub Actions
+  keep-alive (`.github/workflows/keep-alive.yml`) that pings `/api/health` every 10 minutes —
+  one awake service stays within the 750 free instance-hours/month. The static frontend is
+  served from a CDN and never spins down. For extra reliability add a free external pinger:
+  UptimeRobot or cron-job.org hitting the health URL every 10-14 min.
+- The in-memory rate limiter is single-instance; scale it to multiple replicas before
+  bumping the rate limit above a single instance's capacity.
 
 ## License
 

@@ -1,0 +1,52 @@
+# Render Blueprint — deploy the whole app (API + frontend) at once.
+#
+#   https://render.com/docs/blueprint-spec
+#
+# The database is a DURABLE free Neon Postgres (Render's free Postgres is wiped
+# after 30 days). After applying this blueprint:
+#   1. Create a project in Neon -> copy its connection string
+#      (e.g. postgresql://user:pass@ep-xxx-xxx.region.neon.tech/constitution?sslmode=require)
+#   2. In the Render dashboard for bidhan-api -> Environment -> set DATABASE_URL to that string.
+#   3. Re-deploy bidhan-api (or push to main) so startup runs migrations + seed.
+#
+# Service names must be globally unique on Render; rename the two services below if a
+# name is taken and mirror that change in CORS_ORIGINS / VITE_API_BASE.
+
+services:
+  # --- FastAPI backend (long-running web service; Docker build) ---
+  - type: web
+    name: bidhan-api
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: backend/Dockerfile
+    rootDir: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # paste the Neon connection string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://bidhan-frontend.onrender.com
+      - key: LOG_LEVEL
+        value: info
+
+  # --- React SPA (static build, served from a CDN - never spins down) ---
+  - type: web
+    name: bidhan-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: frontend-react
+    buildCommand: npm ci && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE
+        value: https://bidhan-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
