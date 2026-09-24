@@ -1,17 +1,30 @@
-# Keep the free Render API warm so it doesn't spin down after 15 min of idle.
+# Keep the free Render API warm so it never spins down after 15 min of idle.
 #
-# Render's free Web Service slots consume ~720-744 h/month when kept awake 24/7,
-# which stays under the 750 free instance-hour cap. The frontend is a static site
-# (CDN) and needs no pinging.
+# Render's free Web Service sleeps after 15 min with zero inbound requests (the
+# first request after sleep takes ~1 min to wake). This workflow pings every 5
+# minutes — a 3x safety margin against GitHub's scheduler latency (which can
+# delay cron runs by 5-10+ min) — so the free instance stays awake 24/7 within
+# the 750 instance-hours/month allowance. The frontend lives on Vercel
+# (static/CDN) and never spins down, so only the API needs pinging.
 #
-# Optional: add a second, external free pinger (UptimeRobot or cron-job.org, every
-# 10-14 min against https://bidhan-api.onrender.com/api/health) for extra reliability.
+# Each run retries up to 3 times and FAILS the job if the API is unhealthy after
+# the last retry, so GitHub surfaces an Actions failure + email instead of the
+# service silently sleeping. A sleeping instance fails the first probe (~1 min
+# cold start), hence --max-time 90 on every attempt.
+#
+# WARNING: GitHub automatically disables scheduled workflows after ~60 days
+# without repository activity (this applies to public repos too), so for a truly
+# "never sleeps" guarantee also add a FREE external pinger:
+#   - cron-job.org  -> every 5-10 min   -> https://bidhan-api.onrender.com/api/health
+#   - UptimeRobot    -> every 5 min     -> https://bidhan-api.onrender.com/api/health
+# One external pinger on its own is enough to keep the service awake; the two
+# methods are independent so a failure in either doesn't take the app down.
 
 name: keep-alive
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -19,6 +32,19 @@ jobs:
     name: Ping Render API
     runs-on: ubuntu-latest
     steps:
-      - name: Ping backend health endpoint
-        run: curl -sS -o /dev/null -w "api health HTTP %{http_code}\n" "https://bidhan-api.onrender.com/api/health"
-        timeout-minutes: 5
+      - name: Ping backend health endpoint (retry on wake)
+        shell: bash
+        run: |
+          url="https://bidhan-api.onrender.com/api/health"
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 90 "$url" || true)
+            if [ "$code" = "200" ]; then
+              echo "api health HTTP $code (attempt $attempt)"
+              exit 0
+            fi
+            echo "api health returned HTTP $code (attempt $attempt) - retrying in 20s"
+            sleep 20
+          done
+          echo "::error::Render API health check failed after 3 attempts - service may be down or sleeping"
+          exit 1
+        timeout-minutes: 6

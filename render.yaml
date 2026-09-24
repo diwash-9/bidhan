@@ -27,8 +27,10 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      # Frontend origin(s) allowed to call the API (Render + Vercel hosts).
+      # Add your custom domain here if you attach one to Vercel, e.g. https://app.yourdomain.com
       - key: CORS_ORIGINS
-        value: https://bidhan-frontend.onrender.com
+        value: https://bidhan-frontend.onrender.com,https://bidhan.vercel.app
       - key: LOG_LEVEL
         value: info
 
