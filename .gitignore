@@ -22,6 +22,7 @@ build/
 
 # --- Private project docs (never pushed) ---
 .project-docs/
+resource/
 
 # --- Editor / OS ---
 .vscode/

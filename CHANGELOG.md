@@ -3,6 +3,58 @@
 All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com). Versioning follows semantic intent (pre-1.0).
 
+## [Unreleased]: Hearts rework — enforced 0-heart block, 25 cap, 3-min refills
+
+Playing with 0 hearts was still possible: quiz attempts were blocked server-side,
+but finishing a lesson (and unlocking the next one) had no hearts gate, and the
+quiz UI stayed interactive behind a soft error banner (keyboard shortcuts bypassed
+the disabled buttons). Hearts are now a hard block, the cap is 25, and each heart
+refills in 3 minutes.
+
+### Fixed
+- **Completion gated on hearts**: `POST .../articles/{id}/complete` returns 403 at
+  0 hearts (after the quiz-pass check; `get_hearts()` refills first, attempts persist
+  so no quiz progress is lost while waiting).
+- **Frontend hard-block**: quiz answers (click + keyboard 1-4), lesson start, and
+  lesson finish are all disabled at 0 hearts; a blocking out-of-hearts panel with a
+  live refill countdown replaces the soft banner and points to free practice.
+
+### Changed
+- **Max hearts 10 → 25**, **refill 30 min → 3 min** (`MAX_HEARTS`, `HEART_REFILL_INTERVAL`,
+  `Hearts` column defaults, migration `d6e7f8a9b0c1` tops everyone up to 25).
+
+### Verified
+- Backend: **37 tests passing** (incl. new `test_complete_blocked_at_zero_hearts`),
+  `ruff` clean. Refill-timer tests rewritten for the 3-min interval / 25 cap.
+- Frontend: `typecheck`, `lint`, `build` clean.
+
+## [Unreleased]: Performance — first-login and per-lesson stalls fixed
+
+First chapter unlock took 15-20s on first login and every lesson/reload stalled
+~15s on production (Render free + Neon latency). Root causes: 308 individual
+INSERTs on first `ensure_progress_rows`, N+1 SELECTs in `bfs_unlock` and article
+detail, full 308-row progress refetch on every quiz answer and page mount.
+
+### Fixed
+- **Bulk progress materialization**: `ensure_progress_rows` fast COUNT path + single
+  `INSERT ... ON CONFLICT DO NOTHING` (1 round-trip vs 308).
+- **Bulk unlock**: `bfs_unlock` 2 SELECTs + 1 bulk UPDATE, single pass (was per-target
+  SELECTs + fixpoint loop).
+- **Article detail N+1**: 3 indexed queries (clauses + sub-clauses + deps) instead of
+  lazy per-clause loads.
+- **Leaderboard + weekly XP**: column-only selects (no full User ORM / password_hash).
+- **Scoped progress API**: `GET /progress?part_number=N&brief=` and new
+  `GET /progress/summary(?article_id=)` (<0.5KB) for Header/Lesson polling.
+- **Frontend refetch storm**: `staleTime` (parts Infinity, content 5m, progress 60s,
+  summary 15s); `attempt` no longer invalidates full progress (summary only);
+  Header/Profile/Lesson use summary, Path uses part-scoped progress.
+- **DB indexes** (`c5d6e7f8a9b0`): `(user_id,status)`, `(user_id,question_id)`,
+  `(week_start)`, `(article_id,active)`, `(part_number)`.
+
+### Verified
+- `npm run typecheck`, `npm run lint`, `npm run build` clean.
+- Backend `py_compile` clean (full pytest needs live Postgres: `cd backend && pytest -q`).
+
 ## [Unreleased]: Mobile-responsive frontend
 
 The app now adapts to phone-sized screens as well as desktop.
