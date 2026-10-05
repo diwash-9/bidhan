@@ -112,10 +112,13 @@ export default function PathView() {
       </aside>
 
       <section className="flex-1 w-full min-w-0">
-        <div className="mb-8 bg-slate-900 border border-royal-800 rounded-2xl p-4">
+        <div className="mb-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
           <div className="flex items-center justify-between gap-3 mb-2">
             <span className="flex items-center gap-2 text-sm font-bold text-yellow-300">
-              <Trophy className="w-5 h-5 fill-yellow-300" /> Weekly Quest
+              <span className="inline-flex rounded-lg bg-yellow-400/10 border border-yellow-400/20 p-1">
+                <Trophy className="w-4 h-4 fill-yellow-300" />
+              </span>
+              Weekly Quest
             </span>
             <span className="text-sm font-bold text-slate-200">
               {weeklyXp}/{weeklyGoal} XP

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, History, Search } from 'lucide-react'
+import { FileText, History, Plus, Search } from 'lucide-react'
 
 import { useAdminArticles, useAdminRevisions, useParts } from '@/hooks/useApi'
 
@@ -28,9 +28,9 @@ export default function AdminView() {
         </div>
         <Link
           to="/admin/articles/new"
-          className="px-4 py-2 rounded-full bg-crimson-600 hover:bg-crimson-500 border border-crimson-500 text-white font-semibold text-sm shadow-lg shadow-crimson-900/30 transition"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-crimson-600 hover:bg-crimson-500 border border-crimson-500 text-white font-semibold text-sm shadow-lg shadow-crimson-900/30 transition"
         >
-          + New article
+          <Plus className="w-4 h-4" /> New article
         </Link>
       </div>
 

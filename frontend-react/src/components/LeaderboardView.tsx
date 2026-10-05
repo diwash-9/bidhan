@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Crown, Flame, Medal, Star, User } from 'lucide-react'
+import { Crown, Flame, Medal, Star, Trophy, User } from 'lucide-react'
 
 import { useLeaderboard } from '@/hooks/useApi'
 import { useAuthStore } from '@/store/auth'
@@ -20,14 +20,22 @@ export default function LeaderboardView() {
   const { data: rows, isPending } = useLeaderboard(20, window)
 
   if (isPending || !rows) {
-    return <div className="py-16 text-center text-slate-500">Loading leaderboard…</div>
+    return (
+      <div className="py-16 text-center text-slate-500 max-w-4xl mx-auto">
+        <Crown className="w-8 h-8 mx-auto mb-3 text-slate-600" />
+        Loading leaderboard…
+      </div>
+    )
   }
 
   return (
-    <div className="bg-slate-900 border-2 border-royal-900 rounded-3xl p-6 max-w-4xl mx-auto">
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-4xl mx-auto shadow-xl">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Crown className="w-6 h-6 text-yellow-400" /> Leaderboard
+        <h2 className="text-2xl font-bold font-display flex items-center gap-2">
+          <span className="inline-flex rounded-xl bg-yellow-400/10 border border-yellow-400/20 p-1.5">
+            <Crown className="w-5 h-5 text-yellow-400" />
+          </span>
+          Leaderboard
         </h2>
         <div className="flex bg-slate-800 rounded-full p-1 border border-slate-700" role="tablist" aria-label="Leaderboard window">
           {(['week', 'all'] as const).map((w) => (
@@ -56,7 +64,11 @@ export default function LeaderboardView() {
       </p>
 
       {rows.length === 0 && (
-        <p className="py-10 text-center text-slate-500">No entries yet. Complete a lesson to join the race!</p>
+        <div className="py-12 text-center">
+          <Trophy className="w-10 h-10 mx-auto mb-3 text-slate-600" />
+          <p className="text-slate-400 font-semibold">No entries yet</p>
+          <p className="text-sm text-slate-500 mt-1">Complete a lesson to join the race!</p>
+        </div>
       )}
 
       <div className="space-y-2">

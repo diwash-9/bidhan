@@ -3,6 +3,27 @@
 All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com). Versioning follows semantic intent (pre-1.0).
 
+## [Unreleased]: Professional UI polish
+
+Showcase-ready visual pass with zero logic changes (all data hooks, routes, and
+game rules untouched).
+
+### Changed
+- **Auth screen**: split hero layout with shared SVG brand mark, feature highlights,
+  and refined form card (replaces the flag-emoji placeholder).
+- **Lesson view**: question progress bar, icon-based correct/wrong answer states
+  (no more strike-through or text-symbol hearts), icon buttons, emoji-free copy.
+- **Profile**: avatar initial, best-streak line, weekly-quest bar, constitution
+  progress with unlocked-lesson hint — all from the existing summary payload.
+- **Leaderboard**: branded header, icon empty state, consistent card styling.
+- **Path & header**: calmer stat pills, refined weekly-quest card.
+- **Admin**: icon action button.
+- **Global**: brand focus ring, selection color, dark scrollbars, theme-color and
+  social meta tags, `display=swap` fonts.
+
+### Verified
+- `npm run typecheck`, `npm run lint`, `npm run build` clean.
+
 ## [Unreleased]: Hearts rework — enforced 0-heart block, 25 cap, 3-min refills
 
 Playing with 0 hearts was still possible: quiz attempts were blocked server-side,

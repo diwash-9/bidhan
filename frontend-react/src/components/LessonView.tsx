@@ -287,7 +287,11 @@ export default function LessonView() {
               className="mb-4 w-full flex items-center justify-center gap-2 p-3 rounded-xl text-sm font-semibold border border-royal-700/60 bg-royal-900/30 text-royal-200 hover:bg-royal-900/60 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Eye className="w-4 h-4" />
-              {isPractice ? 'Show article (free in practice)' : 'Show article (−1 ♥)'}
+              {isPractice ? 'Show article (free in practice)' : (
+                <span className="inline-flex items-center gap-1.5">
+                  Show article <Heart className="w-3.5 h-3.5 fill-crimson-400 text-crimson-400" /> <span className="text-royal-200/70">−1</span>
+                </span>
+              )}
             </button>
           ) : (
             <div className="mb-4">
@@ -308,6 +312,19 @@ export default function LessonView() {
 
           {!finished && current && (
             <>
+              <div
+                className="h-1.5 rounded-full bg-slate-800 overflow-hidden mb-4"
+                role="progressbar"
+                aria-valuenow={currentIdx}
+                aria-valuemin={0}
+                aria-valuemax={quiz.length}
+                aria-label={`Question ${currentIdx + 1} of ${quiz.length}`}
+              >
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-royal-500 to-crimson-500 transition-all duration-300"
+                  style={{ width: `${Math.round((currentIdx / Math.max(1, quiz.length)) * 100)}%` }}
+                />
+              </div>
               <p className="text-slate-200 font-medium mb-4 break-words">
                 <span className="text-xs font-bold text-slate-500 mr-2">{currentIdx + 1}.</span>
                 {current.question_text}
@@ -315,10 +332,12 @@ export default function LessonView() {
               <div key={shakes} className={`grid gap-2 sm:gap-3 ${wrongLatest ? 'animate-shake' : ''}`}>
                 {(['A', 'B', 'C', 'D'] as const).map((opt) => {
                   const text = current[`option_${opt.toLowerCase()}` as keyof typeof current] as string
-                  let style = 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+                  const isCorrectOpt = answered && opt === answered.correct_option
+                  const isPickedWrong = answered && opt === answered.selected_option && !answered.is_correct
+                  let style = 'bg-slate-950 border-slate-800 text-slate-300 hover:border-royal-600 hover:bg-slate-800 hover:text-white'
                   if (answered) {
-                    if (opt === answered.correct_option) style = 'correct bg-royal-500/20 border-royal-500 text-royal-300'
-                    else if (opt === answered.selected_option) style = 'bg-slate-800 border-slate-600 text-slate-500 line-through'
+                    if (isCorrectOpt) style = 'correct bg-royal-500/20 border-royal-500 text-royal-200'
+                    else if (isPickedWrong) style = 'bg-crimson-500/10 border-crimson-500/60 text-crimson-200'
                     else style = 'bg-slate-950 border-slate-800 text-slate-500'
                   }
                   return (
@@ -329,8 +348,14 @@ export default function LessonView() {
                       aria-pressed={answered?.selected_option === opt}
                       className={`p-3 rounded-xl text-left text-sm font-semibold transition border ${style} disabled:cursor-not-allowed`}
                     >
-                      <span className={`inline-flex items-center justify-center w-6 h-6 mr-3 rounded-lg bg-slate-800/80 text-xs font-bold border border-slate-700 ${opt === answered?.correct_option ? 'correct' : ''}`}>
-                        {opt}
+                      <span className={`inline-flex items-center justify-center w-6 h-6 mr-3 rounded-lg text-xs font-bold border ${
+                        isCorrectOpt
+                          ? 'correct bg-royal-500/30 border-royal-400 text-royal-200'
+                          : isPickedWrong
+                            ? 'bg-crimson-500/20 border-crimson-500/60 text-crimson-200'
+                            : 'bg-slate-800/80 border-slate-700 text-slate-300'
+                      }`}>
+                        {isCorrectOpt ? <CheckCircle className="w-3.5 h-3.5" /> : isPickedWrong ? <XCircle className="w-3.5 h-3.5" /> : opt}
                       </span>
                       {text}
                     </button>
@@ -350,12 +375,12 @@ export default function LessonView() {
                   >
                     {answered.is_correct ? (
                       <span className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 shrink-0" /> +{answered.xp_earned} XP: {answered.explanation}
+                        <CheckCircle className="w-4 h-4 shrink-0" /> +{answered.xp_earned} XP<span className="text-royal-400/70">·</span><span className="font-normal">{answered.explanation}</span>
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4 shrink-0" />
-                        {isPractice ? 'Not quite. Keep trying!' : `-1 ${'♥'}: ${answered.explanation}`}
+                        <Heart className="w-4 h-4 shrink-0 fill-crimson-500 text-crimson-500" />
+                        {isPractice ? 'Not quite — keep trying!' : <><span className="font-bold">−1 heart.</span><span className="font-normal">{answered.explanation}</span></>}
                       </span>
                     )}
                   </div>
@@ -377,8 +402,9 @@ export default function LessonView() {
           )}
 
           {finished && (
-            <div className="p-4 rounded-xl bg-royal-500/10 border border-royal-500/30 text-royal-200 font-semibold text-center">
-              {isPractice ? 'Practice session complete! 🎉' : 'Quiz passed! 🎉 You may finish the lesson.'}
+            <div className="p-4 rounded-xl bg-royal-500/10 border border-royal-500/30 text-royal-200 font-semibold text-center flex items-center justify-center gap-2">
+              <CheckCircle className="w-5 h-5 shrink-0" />
+              {isPractice ? 'Practice session complete — great review!' : 'Quiz passed — you may finish the lesson.'}
             </div>
           )}
 
@@ -398,9 +424,9 @@ export default function LessonView() {
       )}
 
       {done && (
-        <div className="mt-6 mb-8 p-4 rounded-xl bg-royal-500/10 border border-royal-500/30 text-royal-200 font-semibold text-center">
-          <CheckCircle className="w-5 h-5 inline mr-2" />
-          {saved ? 'Lesson completed and saved! 🎉' : 'You already completed this lesson. 🎉'}
+        <div className="mt-6 mb-8 p-4 rounded-xl bg-royal-500/10 border border-royal-500/30 text-royal-200 font-semibold text-center flex items-center justify-center gap-2">
+          <CheckCircle className="w-5 h-5 shrink-0" />
+          {saved ? 'Lesson completed and saved!' : 'You already completed this lesson.'}
         </div>
       )}
 
@@ -424,7 +450,11 @@ export default function LessonView() {
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
             }`}
           >
-            {completeMutation.isPending ? 'Completing…' : outOfHearts ? 'Complete Lesson (needs ♥)' : 'Complete Lesson (+15 XP)'}
+            {completeMutation.isPending ? 'Completing…' : outOfHearts ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                Complete Lesson <Heart className="w-4 h-4 fill-current" />
+              </span>
+            ) : 'Complete Lesson (+15 XP)'}
           </button>
         )
       )}
