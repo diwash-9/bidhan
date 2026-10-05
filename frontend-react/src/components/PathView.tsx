@@ -2,7 +2,6 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen,
   Check,
-  ChevronRight,
   Flame,
   Lock,
   Play,
@@ -260,14 +259,6 @@ export default function PathView() {
                     </span>
                   )}
                 </div>
-                {locked && (
-                  <span
-                    className="absolute top-1/2 -translate-y-1/2 text-slate-600"
-                    style={{ left: x + NODE_D / 2 + 16, width: 10 }}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </span>
-                )}
               </div>
             )
           })}
