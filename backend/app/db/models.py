@@ -163,8 +163,8 @@ class Hearts(Base):
     __tablename__ = "hearts"
 
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    hearts_left: Mapped[int] = mapped_column(Integer, default=10)
-    max_hearts: Mapped[int] = mapped_column(Integer, default=10)
+    hearts_left: Mapped[int] = mapped_column(Integer, default=25)
+    max_hearts: Mapped[int] = mapped_column(Integer, default=25)
     last_refill_ts: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 

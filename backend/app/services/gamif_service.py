@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select, update
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.db.models import (
@@ -17,8 +18,8 @@ XP_PER_ARTICLE = 15
 XP_PER_QUESTION = 5
 PRACTICE_XP_PER_QUESTION = 4
 WEEKLY_XP_GOAL = 100
-HEART_REFILL_INTERVAL = timedelta(minutes=30)
-MAX_HEARTS = 10
+HEART_REFILL_INTERVAL = timedelta(minutes=3)
+MAX_HEARTS = 25
 
 
 def utcnow() -> datetime:
@@ -28,16 +29,58 @@ def utcnow() -> datetime:
 
 
 def ensure_progress_rows(db: Session, user_id: str) -> None:
-    """Materialize a row per article for a user, starting with the root node unlocked."""
-    existing = set(
-        db.scalars(
-            select(UserArticleProgress.article_id).where(UserArticleProgress.user_id == user_id)
-        ).all()
+    """Materialize a row per article for a user, starting with the root node unlocked.
+
+    Optimized for high-latency DBs (Neon/Render free tier):
+    - Fast path: single COUNT; return early when already materialized.
+    - First login: single bulk INSERT with ON CONFLICT DO NOTHING instead of
+      308 individual INSERTs (was 15-20s over WAN, now 1 round-trip).
+    """
+    existing_count = db.scalar(
+        select(func.count())
+        .select_from(UserArticleProgress)
+        .where(UserArticleProgress.user_id == user_id)
+    ) or 0
+    if existing_count > 0:
+        total_articles = db.scalar(select(func.count()).select_from(Article)) or 0
+        if existing_count >= total_articles:
+            return
+        # Partial rows (new articles added later): bulk-insert only the missing ones.
+        existing_ids = set(
+            db.scalars(
+                select(UserArticleProgress.article_id).where(
+                    UserArticleProgress.user_id == user_id
+                )
+            ).all()
+        )
+        article_ids = db.scalars(select(Article.id)).all()
+        missing = [aid for aid in article_ids if aid not in existing_ids]
+        if not missing:
+            return
+        db.execute(
+            pg_insert(UserArticleProgress)
+            .values([{"user_id": user_id, "article_id": aid, "status": "locked"} for aid in missing])
+            .on_conflict_do_nothing()
+        )
+        db.flush()
+        return
+    article_ids = db.scalars(select(Article.id)).all()
+    if not article_ids:
+        return
+    db.execute(
+        pg_insert(UserArticleProgress)
+        .values(
+            [
+                {
+                    "user_id": user_id,
+                    "article_id": aid,
+                    "status": "unlocked" if aid == "ART-1" else "locked",
+                }
+                for aid in article_ids
+            ]
+        )
+        .on_conflict_do_nothing()
     )
-    article_ids = db.scalars(select(Article.id).order_by(Article.article_number)).all()
-    for aid in article_ids:
-        if aid not in existing:
-            db.add(UserArticleProgress(user_id=user_id, article_id=aid, status="unlocked" if aid == "ART-1" else "locked"))
     db.flush()
 
 
@@ -149,6 +192,10 @@ def bfs_unlock(db: Session, user_id: str, completed_article_id: str) -> list[str
     Edge semantic (from `db/enrich_dependencies.py`): source → target means source
     is a prerequisite of target. A node becomes `unlocked` only when every incoming
     edge originates from a completed node. Completed nodes keep their status.
+
+    Optimized: 2 SELECTs + 1 bulk UPDATE (was N+1 SELECTs + fixpoint loop scan).
+    Single pass is sufficient because newly-unlocked (not completed) nodes can
+    never satisfy further prereqs — cascade only flows through completed nodes.
     """
     completed = set(
         db.scalars(
@@ -160,78 +207,94 @@ def bfs_unlock(db: Session, user_id: str, completed_article_id: str) -> list[str
     )
     completed.add(completed_article_id)
 
-    edges = db.scalars(select(ArticleDependency)).all()
+    # Only (target, source) pairs are needed — no ORM objects.
+    edge_rows = db.execute(select(ArticleDependency.target_id, ArticleDependency.source_id)).all()
     prereqs: dict[str, set[str]] = {}
-    for e in edges:
-        prereqs.setdefault(e.target_id, set()).add(e.source_id)
+    for target_id, source_id in edge_rows:
+        prereqs.setdefault(target_id, set()).add(source_id)
+    if not prereqs:
+        return []
 
-    newly_unlocked: list[str] = []
-    # Repeat until fixpoint: unlocking can cascade.
-    progressed = True
-    while progressed:
-        progressed = False
-        for target, prereq_set in prereqs.items():
-            if target in completed or target in newly_unlocked:
-                continue
-            if prereq_set <= completed:
-                row = db.scalar(
-                    select(UserArticleProgress).where(
-                        UserArticleProgress.user_id == user_id,
-                        UserArticleProgress.article_id == target,
-                    )
-                )
-                if row and row.status != "completed":
-                    row.status = "unlocked"
-                newly_unlocked.append(target)
-                progressed = True
-    return newly_unlocked
+    candidates = [t for t, req in prereqs.items() if t not in completed and req <= completed]
+    if not candidates:
+        return []
+
+    # Fetch current statuses for candidates in one query; never overwrite completed.
+    existing = dict(
+        db.execute(
+            select(UserArticleProgress.article_id, UserArticleProgress.status).where(
+                UserArticleProgress.user_id == user_id,
+                UserArticleProgress.article_id.in_(candidates),
+            )
+        ).all()
+    )
+    to_unlock = [t for t in candidates if existing.get(t) != "completed"]
+    if to_unlock:
+        db.execute(
+            update(UserArticleProgress)
+            .where(
+                UserArticleProgress.user_id == user_id,
+                UserArticleProgress.article_id.in_(to_unlock),
+                UserArticleProgress.status != "completed",
+            )
+            .values(status="unlocked")
+        )
+    return to_unlock
 
 
 def current_week_xp(db: Session, user_id: str) -> int:
     """XP earned this week per the weekly `leagues` snapshot (0 if not started)."""
-    league = db.scalar(
-        select(League).where(
+    xp = db.scalar(
+        select(League.xp_earned).where(
             League.week_start == monday_of_current_week(),
             League.user_id == user_id,
         )
     )
-    return league.xp_earned if league else 0
+    return xp if xp else 0
 
 
 def get_leaderboard(db: Session, limit: int = 20, window: str = "all") -> list[dict]:
+    # Column-only selects: never load password_hash / full User ORM for a leaderboard.
     if window == "week":
         week_start = monday_of_current_week()
-        q = (
-            select(User, League.xp_earned)
+        rows = db.execute(
+            select(
+                User.id,
+                User.display_name,
+                User.total_xp,
+                User.current_streak,
+                League.xp_earned,
+            )
             .join(League, League.user_id == User.id)
             .where(League.week_start == week_start)
             .order_by(League.xp_earned.desc(), User.display_name.asc())
             .limit(limit)
-        )
-        rows = db.execute(q).all()
+        ).all()
         return [
             {
                 "rank": i + 1,
-                "user_id": u.id,
-                "display_name": u.display_name,
-                "total_xp": u.total_xp,
+                "user_id": uid,
+                "display_name": name,
+                "total_xp": total,
                 "xp_earned": xp,
-                "current_streak": u.current_streak,
+                "current_streak": streak,
             }
-            for i, (u, xp) in enumerate(rows)
+            for i, (uid, name, total, streak, xp) in enumerate(rows)
         ]
 
     rows = db.execute(
-        select(User).order_by(User.total_xp.desc(), User.display_name.asc()).limit(limit)
-    ).scalars().all()
+        select(User.id, User.display_name, User.total_xp, User.current_streak)
+        .order_by(User.total_xp.desc(), User.display_name.asc())
+        .limit(limit)
+    ).all()
     return [
         {
             "rank": i + 1,
-            "user_id": u.id,
-            "display_name": u.display_name,
-            "total_xp": u.total_xp,
-            "xp_earned": u.total_xp,
-            "current_streak": u.current_streak,
+            "user_id": uid,
+            "display_name": name,
+            "total_xp": total,
+            "xp_earned": total,
+            "current_streak": streak,
         }
-        for i, u in enumerate(rows)
+        for i, (uid, name, total, streak) in enumerate(rows)
     ]

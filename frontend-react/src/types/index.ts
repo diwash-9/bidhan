@@ -110,6 +110,26 @@ export interface UserProgress {
   articles: ArticleProgress[]
 }
 
+export interface ProgressSummary {
+  user_id: string
+  display_name: string
+  current_streak: number
+  longest_streak: number
+  total_xp: number
+  last_active_date: string | null
+  hearts_left: number
+  max_hearts: number
+  hearts_refill_at: string | null
+  weekly_xp: number
+  weekly_xp_goal: number
+  total_articles: number
+  completed_count: number
+  unlocked_count: number
+  article_id: string | null
+  article_status: ArticleStatus | null
+  article_stars: number
+}
+
 export interface CompleteResult {
   status: string
   xp_earned: number

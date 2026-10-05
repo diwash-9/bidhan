@@ -26,9 +26,10 @@ def set_hearts_full(user_id: str) -> None:
     with SessionLocal() as db:
         h = db.get(Hearts, user_id)
         if h is None:
-            db.add(Hearts(user_id=user_id, hearts_left=10, max_hearts=10))
+            db.add(Hearts(user_id=user_id, hearts_left=25, max_hearts=25))
         else:
-            h.hearts_left = 10
+            h.hearts_left = 25
+            h.max_hearts = 25
             h.last_refill_ts = None
         db.commit()
 
@@ -202,9 +203,10 @@ def test_quiz_attempt_wrong_consumes_heart(auth_user):
     with SessionLocal() as db:
         h = db.get(Hearts, uid)
         if h is None:
-            db.add(Hearts(user_id=uid, hearts_left=10, max_hearts=10))
+            db.add(Hearts(user_id=uid, hearts_left=25, max_hearts=25))
         else:
-            h.hearts_left = 10
+            h.hearts_left = 25
+            h.max_hearts = 25
             h.last_refill_ts = None
         db.commit()
     q = client.get("/api/articles/ART-1/quiz").json()[0]
@@ -231,12 +233,13 @@ def test_progress_reports_max_hearts_and_refill(auth_user):
     uid = auth_user["user_id"]
     with SessionLocal() as db:
         h = db.get(Hearts, uid)
-        h.hearts_left = 10
+        h.hearts_left = 25
+        h.max_hearts = 25
         h.last_refill_ts = None
         db.commit()
     data = client.get(f"/api/users/{uid}/progress").json()
-    assert data["max_hearts"] == 10
-    assert data["hearts_left"] == 10
+    assert data["max_hearts"] == 25
+    assert data["hearts_left"] == 25
     assert data["hearts_refill_at"] is None  # full -> no timer
 
 
@@ -280,6 +283,44 @@ def test_heart_blocks_attempt_at_zero(auth_user):
     assert n == before
 
 
+def test_complete_blocked_at_zero_hearts():
+    # Fresh user: pass the ART-1 quiz, then finishing with 0 hearts is refused.
+    email = f"pytest-{uuid.uuid4().hex[:8]}@test.com"
+    r = client.post(
+        "/api/auth/register",
+        json={"email": email, "password": PASSWORD, "display_name": "Hearts Gate"},
+    )
+    assert r.status_code == 201, r.text
+    import jwt as pyjwt
+
+    uid = pyjwt.decode(r.json()["access_token"], options={"verify_signature": False})["sub"]
+    set_hearts_full(uid)
+    for q in client.get("/api/articles/ART-1/quiz").json():
+        probe = client.post(
+            f"/api/users/{uid}/quiz/{q['id']}/attempt",
+            json={"question_id": q["id"], "selected_option": "A"},
+        )
+        assert probe.status_code == 200, probe.text
+        if not probe.json()["is_correct"]:
+            r = client.post(
+                f"/api/users/{uid}/quiz/{q['id']}/attempt",
+                json={"question_id": q["id"], "selected_option": probe.json()["correct_option"]},
+            )
+            assert r.status_code == 200, r.text
+    with SessionLocal() as db:
+        h = db.get(Hearts, uid)
+        h.hearts_left = 0
+        h.last_refill_ts = None
+        db.commit()
+    r = client.post(f"/api/users/{uid}/articles/ART-1/complete")
+    assert r.status_code == 403
+    assert "out of hearts" in r.json()["detail"].lower()
+    set_hearts_full(uid)
+    r = client.post(f"/api/users/{uid}/articles/ART-1/complete")
+    assert r.status_code == 200
+    assert r.json()["status"] == "success"
+
+
 def test_hearts_use_endpoint_charges_and_blocks(auth_user):
     uid = auth_user["user_id"]
     with SessionLocal() as db:
@@ -291,7 +332,7 @@ def test_hearts_use_endpoint_charges_and_blocks(auth_user):
     assert r.status_code == 200
     body = r.json()
     assert body["hearts_left"] == 0
-    assert body["max_hearts"] == 10
+    assert body["max_hearts"] == 25
     assert body["refill_at"] is not None  # timer starts once below cap
     assert client.post(f"/api/users/{uid}/hearts/use").status_code == 403
 
@@ -303,17 +344,17 @@ def test_hearts_refill_after_interval(auth_user):
 
         h = db.get(Hearts, uid)
         h.hearts_left = 5
-        h.last_refill_ts = datetime.now(timezone.utc) - timedelta(minutes=85)
+        h.last_refill_ts = datetime.now(timezone.utc) - timedelta(minutes=7)
         db.commit()
     data = client.get(f"/api/users/{uid}/progress").json()
-    # 85 minutes elapsed at 30 min/heart -> exactly 2 refilled (7 left).
+    # 7 minutes elapsed at 3 min/heart -> exactly 2 refilled (7 left).
     assert data["hearts_left"] == 7
-    # Timer continues (not full); carries 25 min, so next refill is ~5 min away.
+    # Timer continues (not full); carries 1 min, so next refill is ~2 min away.
     from datetime import datetime as dt
 
     refill_at = dt.fromisoformat(data["hearts_refill_at"])
     remaining = (refill_at - dt.now(timezone.utc)).total_seconds()
-    assert 200 < remaining < 800
+    assert 60 < remaining < 180
 
 
 def test_hearts_full_resets_timer(auth_user):
@@ -322,7 +363,7 @@ def test_hearts_full_resets_timer(auth_user):
         from datetime import datetime, timezone
 
         h = db.get(Hearts, uid)
-        h.hearts_left = 8
+        h.hearts_left = 23
         h.last_refill_ts = datetime.now(timezone.utc)
         db.commit()
     data = client.get(f"/api/users/{uid}/progress").json()
@@ -332,11 +373,11 @@ def test_hearts_full_resets_timer(auth_user):
         from datetime import datetime, timedelta, timezone
 
         h = db.get(Hearts, uid)
-        h.hearts_left = 9
-        h.last_refill_ts = datetime.now(timezone.utc) - timedelta(minutes=31)
+        h.hearts_left = 24
+        h.last_refill_ts = datetime.now(timezone.utc) - timedelta(minutes=4)
         db.commit()
     data = client.get(f"/api/users/{uid}/progress").json()
-    assert data["hearts_left"] == 10
+    assert data["hearts_left"] == 25
     assert data["hearts_refill_at"] is None
 
 

@@ -139,6 +139,29 @@ class UserProgressOut(BaseModel):
     articles: list[ArticleProgressOut]
 
 
+class ProgressSummaryOut(BaseModel):
+    """Lightweight progress for Header/Lesson polling — no 308-row array."""
+
+    user_id: str
+    display_name: str
+    current_streak: int
+    longest_streak: int
+    total_xp: int
+    last_active_date: str | None
+    hearts_left: int
+    max_hearts: int
+    hearts_refill_at: str | None
+    weekly_xp: int
+    weekly_xp_goal: int
+    total_articles: int
+    completed_count: int
+    unlocked_count: int
+    # Optional single-article status when ?article_id=ART-N is passed.
+    article_id: str | None = None
+    article_status: str | None = None
+    article_stars: int = 0
+
+
 class HeartsState(BaseModel):
     hearts_left: int
     max_hearts: int

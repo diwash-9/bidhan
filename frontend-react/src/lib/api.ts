@@ -8,6 +8,7 @@ import type {
   HeartsState,
   LeaderboardEntry,
   Part,
+  ProgressSummary,
   QuizQuestion,
   QuizResult,
   Revision,
@@ -100,8 +101,16 @@ export const api = {
     return request(`/articles/${articleId}/quiz`)
   },
 
-  getUserProgress(userId: string): Promise<UserProgress> {
-    return request(`/users/${userId}/progress`)
+  getUserProgress(userId: string, partNumber?: number, brief = false): Promise<UserProgress> {
+    const params = new URLSearchParams()
+    if (partNumber != null) params.set('part_number', String(partNumber))
+    if (brief) params.set('brief', 'true')
+    const qs = params.toString()
+    return request(`/users/${userId}/progress${qs ? `?${qs}` : ''}`)
+  },
+  getProgressSummary(userId: string, articleId?: string): Promise<ProgressSummary> {
+    const qs = articleId ? `?article_id=${encodeURIComponent(articleId)}` : ''
+    return request(`/users/${userId}/progress/summary${qs}`)
   },
   completeArticle(userId: string, articleId: string): Promise<CompleteResult> {
     return request(`/users/${userId}/articles/${articleId}/complete`, { method: 'POST' })

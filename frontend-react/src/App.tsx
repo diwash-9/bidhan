@@ -14,7 +14,15 @@ import { useAuthStore } from '@/store/auth'
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, refetchOnWindowFocus: false },
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      // Daily-use defaults: avoid refetch storms on navigation. Individual
+      // hooks override staleTime where content is static (parts: Infinity)
+      // or hot (progress-summary: 15s).
+      staleTime: 30 * 1000,
+      gcTime: 5 * 60 * 1000,
+    },
   },
 })
 

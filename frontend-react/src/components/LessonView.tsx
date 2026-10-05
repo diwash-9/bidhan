@@ -16,7 +16,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 
 import Confetti from '@/components/Confetti'
 import RefillCountdown from '@/components/RefillCountdown'
-import { useArticle, useAttemptQuestion, useCompleteArticle, useHeart, useQuiz, useUserProgress } from '@/hooks/useApi'
+import { useArticle, useAttemptQuestion, useCompleteArticle, useHeart, useProgressSummary, useQuiz } from '@/hooks/useApi'
 import { sfxComplete, sfxCorrect, sfxWrong } from '@/lib/sfx'
 import type { QuizResult } from '@/types'
 
@@ -26,7 +26,9 @@ export default function LessonView() {
   const isPractice = searchParams.get('practice') === '1'
   const { data: article } = useArticle(articleId)
   const { data: quiz = [] } = useQuiz(articleId)
-  const { data: progress, refetch: refetchProgress } = useUserProgress()
+  // Lightweight summary (+ single-article status) instead of the 308-row
+  // full progress — LessonView no longer triggers a full refetch per visit.
+  const { data: progress, refetch: refetchProgress } = useProgressSummary(articleId)
 
   const [phase, setPhase] = useState<'read' | 'quiz'>(isPractice ? 'quiz' : 'read')
   const [revealed, setRevealed] = useState(false)
@@ -42,13 +44,11 @@ export default function LessonView() {
   const attemptMutation = useAttemptQuestion()
   const heartMutation = useHeart()
 
-  const heartsLeft = progress?.hearts_left ?? 10
+  const heartsLeft = progress?.hearts_left ?? 25
   const outOfHearts = !isPractice && heartsLeft <= 0
   const heartsRefillAt = progress?.hearts_refill_at ?? null
 
-  const alreadyCompleted = (progress?.articles ?? []).some(
-    (a) => a.article_id === articleId && a.status === 'completed',
-  )
+  const alreadyCompleted = progress?.article_status === 'completed'
   const current = quiz[currentIdx]
   const allCorrect = quiz.length > 0 && quiz.every((q) => answers[q.id]?.is_correct === true)
   const finished = quiz.length > 0 && currentIdx >= quiz.length && allCorrect
@@ -70,6 +70,12 @@ export default function LessonView() {
   const handleAnswer = useCallback(
     async (letter: string) => {
       if (!current || answers[current.id]?.is_correct) return
+      // Client-side hearts guard: at 0 hearts the server 403s every attempt,
+      // so don't send pointless requests — the empty-hearts panel takes over.
+      if (outOfHearts) {
+        void refetchProgress()
+        return
+      }
       setError(null)
       try {
         const result = await attemptMutation.mutateAsync({
@@ -95,13 +101,13 @@ export default function LessonView() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [current, answers, attemptMutation, isPractice, streak],
+    [current, answers, attemptMutation, isPractice, streak, outOfHearts],
   )
 
   const handleNext = useCallback(() => setCurrentIdx((i) => i + 1), [])
 
   useEffect(() => {
-    if (phase !== 'quiz' || finished || showCelebration) return
+    if (phase !== 'quiz' || finished || showCelebration || outOfHearts) return
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return
       if (e.key >= '1' && e.key <= '4') {
@@ -115,7 +121,7 @@ export default function LessonView() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [phase, finished, showCelebration, current, answers, handleAnswer, handleNext])
+  }, [phase, finished, showCelebration, outOfHearts, current, answers, handleAnswer, handleNext])
 
   const handleStartQuiz = () => {
     setPhase('quiz')
@@ -217,18 +223,26 @@ export default function LessonView() {
           <div className="border-t border-slate-800 pt-6 mt-8">
             <button
               onClick={handleStartQuiz}
-              disabled={quiz.length === 0 || isPractice}
+              disabled={quiz.length === 0 || isPractice || outOfHearts}
+              title={outOfHearts ? "You're out of hearts — wait for a refill" : undefined}
               className={`w-full font-bold py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 ${
-                quiz.length === 0 || isPractice
+                quiz.length === 0 || isPractice || outOfHearts
                   ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                   : 'bg-crimson-600 hover:bg-crimson-500 text-white'
               }`}
             >
               <Sparkles className="w-5 h-5" /> Start Knowledge Check
             </button>
-            <p className="text-xs text-slate-500 text-center mt-3">
-              The article is hidden during the check; re-opening it costs <Heart className="w-3 h-3 inline text-crimson-500 fill-crimson-500" /> 1.
-            </p>
+            {outOfHearts ? (
+              <p className="text-xs text-crimson-300 text-center mt-3 font-semibold">
+                You're out of hearts. Next heart in{' '}
+                <RefillCountdown refillAt={heartsRefillAt} onExpire={refreshHearts} className="font-bold" />.
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500 text-center mt-3">
+                The article is hidden during the check; re-opening it costs <Heart className="w-3 h-3 inline text-crimson-500 fill-crimson-500" /> 1.
+              </p>
+            )}
           </div>
         </>
       )}
@@ -249,10 +263,20 @@ export default function LessonView() {
           {outOfHearts && (
             <div
               role="alert"
-              className="mb-4 p-4 rounded-xl bg-crimson-500/10 border border-crimson-500/40 text-crimson-300 font-semibold text-sm"
+              aria-live="assertive"
+              className="mb-4 p-5 rounded-2xl bg-crimson-500/10 border-2 border-crimson-500/40 text-center"
             >
-              You're out of hearts. Next heart in{' '}
-              <RefillCountdown refillAt={heartsRefillAt} onExpire={refreshHearts} className="font-bold" />.
+              <Heart className="w-8 h-8 mx-auto text-crimson-500 fill-crimson-500 mb-2" />
+              <p className="font-bold text-crimson-200">You're out of hearts!</p>
+              <p className="text-sm text-crimson-300/80 mt-1">
+                Next heart in{' '}
+                <RefillCountdown refillAt={heartsRefillAt} onExpire={refreshHearts} className="font-bold" />.
+                The quiz is paused until then.
+              </p>
+              <p className="text-xs text-slate-400 mt-2">
+                Tip: replay a completed lesson from the <Link to="/" className="text-royal-300 font-semibold hover:text-white">Path</Link> to
+                earn practice XP without spending hearts.
+              </p>
             </div>
           )}
 
@@ -392,14 +416,15 @@ export default function LessonView() {
         !isPractice && (
           <button
             onClick={handleComplete}
-            disabled={!finished || completeMutation.isPending}
+            disabled={!finished || outOfHearts || completeMutation.isPending}
+            title={outOfHearts ? "You're out of hearts — wait for a refill to finish" : undefined}
             className={`w-full font-bold py-4 rounded-2xl transition shadow-lg ${
-              finished
+              finished && !outOfHearts
                 ? 'bg-crimson-600 hover:bg-crimson-500 text-white'
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
             }`}
           >
-            {completeMutation.isPending ? 'Completing…' : 'Complete Lesson (+15 XP)'}
+            {completeMutation.isPending ? 'Completing…' : outOfHearts ? 'Complete Lesson (needs ♥)' : 'Complete Lesson (+15 XP)'}
           </button>
         )
       )}

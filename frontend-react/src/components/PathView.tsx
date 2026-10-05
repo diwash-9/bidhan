@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-import { useArticles, useParts, useUserProgress } from '@/hooks/useApi'
+import { useArticles, useParts, useProgressSummary, useUserProgress } from '@/hooks/useApi'
 import type { ArticleProgress, ArticleStatus } from '@/types'
 
 const ITEM_H = 120
@@ -31,8 +31,10 @@ function daysUntilWeekEnd(): number {
 
 export default function PathView() {
   const { data: parts } = useParts()
-  const { data: progress } = useUserProgress()
   const [selectedPart, setSelectedPart] = useState<number>(1)
+  // Scoped to the visible part (~5-30 rows) instead of all 308 on every load.
+  const { data: progress } = useUserProgress(selectedPart)
+  const { data: summary } = useProgressSummary()
   const { data: articles } = useArticles(selectedPart)
 
   const progressById = useMemo(() => {
@@ -55,8 +57,8 @@ export default function PathView() {
     return idx
   }, [rows, progressById])
 
-  const weeklyXp = progress?.weekly_xp ?? 0
-  const weeklyGoal = progress?.weekly_xp_goal ?? 100
+  const weeklyXp = summary?.weekly_xp ?? progress?.weekly_xp ?? 0
+  const weeklyGoal = summary?.weekly_xp_goal ?? progress?.weekly_xp_goal ?? 100
   const weeklyPct = Math.min(1, weeklyXp / Math.max(1, weeklyGoal))
   const weeklyDone = weeklyXp >= weeklyGoal
 
@@ -139,7 +141,7 @@ export default function PathView() {
             {!weeklyDone && ' days.'}
           </p>
           <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-            <Flame className="w-3 h-3 fill-orange-400 text-orange-400" /> {progress?.current_streak ?? 0} day streak
+            <Flame className="w-3 h-3 fill-orange-400 text-orange-400" /> {summary?.current_streak ?? progress?.current_streak ?? 0} day streak
           </p>
         </div>
 

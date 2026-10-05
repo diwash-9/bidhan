@@ -1,16 +1,16 @@
 import { Award, Flame, Star } from 'lucide-react'
 
-import { useUserProgress } from '@/hooks/useApi'
+import { useProgressSummary } from '@/hooks/useApi'
 
 export default function ProfileView() {
-  const { data: progress, isPending } = useUserProgress()
+  const { data: progress, isPending } = useProgressSummary()
 
   if (isPending || !progress) {
     return <div className="py-16 text-center text-slate-500">Loading profile…</div>
   }
 
-  const completed = progress.articles.filter((a) => a.status === 'completed').length
-  const total = progress.articles.length
+  const completed = progress.completed_count
+  const total = progress.total_articles || 1
 
   return (
     <div>

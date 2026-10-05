@@ -9,6 +9,7 @@ export function useParts() {
     queryKey: ['parts'],
     queryFn: api.getParts,
     staleTime: Infinity,
+    gcTime: 60 * 60 * 1000,
   })
 }
 
@@ -17,6 +18,8 @@ export function useArticles(partNumber: number | null) {
     queryKey: ['articles', partNumber],
     queryFn: () => api.getArticles(partNumber as number),
     enabled: partNumber != null,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   })
 }
 
@@ -25,6 +28,8 @@ export function useArticle(articleId: string | null) {
     queryKey: ['article', articleId],
     queryFn: () => api.getArticle(articleId as string),
     enabled: !!articleId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   })
 }
 
@@ -33,15 +38,33 @@ export function useQuiz(articleId: string | null) {
     queryKey: ['quiz', articleId],
     queryFn: () => api.getQuiz(articleId as string),
     enabled: !!articleId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   })
 }
 
-export function useUserProgress() {
+export function useUserProgress(partNumber?: number) {
   const userId = useAuthStore((s) => s.user?.id)
   return useQuery({
-    queryKey: ['progress', userId],
-    queryFn: () => api.getUserProgress(userId as string),
+    queryKey: ['progress', userId, partNumber ?? 'all'],
+    queryFn: () => api.getUserProgress(userId as string, partNumber),
     enabled: !!userId,
+    // Full 308-row payload: cache aggressively to avoid refetch on every
+    // navigation. Invalidated explicitly on lesson complete.
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  })
+}
+
+/** Tiny <0.5KB payload for Header + LessonView polling (hearts/XP/streak). */
+export function useProgressSummary(articleId?: string) {
+  const userId = useAuthStore((s) => s.user?.id)
+  return useQuery({
+    queryKey: ['progress-summary', userId, articleId ?? 'none'],
+    queryFn: () => api.getProgressSummary(userId as string, articleId),
+    enabled: !!userId,
+    staleTime: 15 * 1000,
+    gcTime: 5 * 60 * 1000,
   })
 }
 
@@ -49,6 +72,8 @@ export function useLeaderboard(limit = 20, window: 'all' | 'week' = 'all') {
   return useQuery({
     queryKey: ['leaderboard', window],
     queryFn: () => api.getLeaderboard(limit, window),
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
   })
 }
 
@@ -58,8 +83,12 @@ export function useCompleteArticle() {
   return useMutation({
     mutationFn: (articleId: string) => api.completeArticle(userId as string, articleId),
     onSuccess: () => {
+      // Unlock changes statuses: refresh full progress + part lists + summary.
+      // Leaderboard also changes (+15 XP) — refresh it here, not per-answer.
       void queryClient.invalidateQueries({ queryKey: ['progress'] })
+      void queryClient.invalidateQueries({ queryKey: ['progress-summary'] })
       void queryClient.invalidateQueries({ queryKey: ['articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] })
     },
   })
 }
@@ -71,8 +100,11 @@ export function useAttemptQuestion() {
     mutationFn: ({ questionId, selectedOption, practice = false }: { questionId: number; selectedOption: string; practice?: boolean }) =>
       api.attemptQuestion(userId as string, questionId, selectedOption, practice),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['progress'] })
-      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] })
+      // Do NOT invalidate ['progress'] here: it refetches the 308-row payload
+      // on every single answer (was the per-question 15s stall). Hearts/XP
+      // refresh via the lightweight summary; full progress refreshes on
+      // lesson complete only.
+      void queryClient.invalidateQueries({ queryKey: ['progress-summary'] })
     },
   })
 }
@@ -83,6 +115,7 @@ export function useHeart() {
   return useMutation({
     mutationFn: () => api.useHeart(userId as string),
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['progress-summary'] })
       void queryClient.invalidateQueries({ queryKey: ['progress'] })
     },
   })

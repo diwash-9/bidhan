@@ -3,7 +3,7 @@ import { Flame, Heart, LogOut, Menu, Star, Volume2, VolumeX, X } from 'lucide-re
 import { Link, useLocation } from 'react-router-dom'
 
 import RefillCountdown from '@/components/RefillCountdown'
-import { useUserProgress } from '@/hooks/useApi'
+import { useProgressSummary } from '@/hooks/useApi'
 import { isSoundMuted, setSoundMuted } from '@/lib/sfx'
 import { useAuthStore } from '@/store/auth'
 
@@ -38,7 +38,8 @@ function FlagMark() {
 
 export default function Header() {
   const { user, logout } = useAuthStore()
-  const { data: progress, refetch } = useUserProgress()
+  // Lightweight (<0.5KB) instead of the 308-row full progress payload.
+  const { data: progress, refetch } = useProgressSummary()
   const location = useLocation()
   const [soundMuted, setMuted] = useState(isSoundMuted())
 
@@ -52,8 +53,8 @@ export default function Header() {
     setMuted(next)
   }
 
-  const heartsLeft = progress?.hearts_left ?? progress?.max_hearts ?? 10
-  const maxHearts = progress?.max_hearts ?? 10
+  const heartsLeft = progress?.hearts_left ?? progress?.max_hearts ?? 25
+  const maxHearts = progress?.max_hearts ?? 25
   const heartsFull = heartsLeft >= maxHearts
 
   const tabs = [
