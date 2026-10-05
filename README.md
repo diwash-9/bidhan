@@ -194,7 +194,7 @@ recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 Devraj Khatiwada (dbus2)
+[MIT](LICENSE) © 2026 Devraj Khatiwada (diwash-9)
 
 ## Acknowledgements
 
