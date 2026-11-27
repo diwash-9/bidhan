@@ -8,6 +8,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const MAX_CHARS = 180
 const ONLINE_TTS = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q='
+// A zero-length WAV. Playing it inside the click gesture grants media playback.
+const SILENT_AUDIO = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
 
 type SpeakMode = 'browser' | 'online' | null
 
@@ -35,6 +37,7 @@ export function useReadAloud(lines: string[]) {
   const audio = useRef<HTMLAudioElement | null>(null)
   const timers = useRef<number[]>([])
   const cancelled = useRef(false)
+  const browserFailed = useRef(false)
 
   const browserSupported =
     typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
@@ -49,6 +52,17 @@ export function useReadAloud(lines: string[]) {
     setSpeaking(false)
     setMode(null)
   }, [clearTimers])
+
+  // Must run from the click handler: browsers allow audio only after a gesture.
+  const primeAudio = useCallback(() => {
+    if (typeof Audio === 'undefined') return
+    const element = audio.current ?? new Audio()
+    audio.current = element
+    element.src = SILENT_AUDIO
+    void element.play().catch(() => {
+      // The explicit "Try online voice" button remains available as a fallback.
+    })
+  }, [])
 
   const stop = useCallback(() => {
     cancelled.current = true
@@ -79,16 +93,18 @@ export function useReadAloud(lines: string[]) {
       }
       const element = audio.current ?? new Audio()
       audio.current = element
+      element.pause()
       element.src = `${ONLINE_TTS}${encodeURIComponent(piece)}`
+      element.load()
       element.onended = () => playNext()
       element.onerror = () => {
         if (cancelled.current) return
-        setError('Online audio could not load. Check your internet connection.')
+        setError('Online audio could not load. Check your internet connection, then try again.')
         finish()
       }
       void element.play().catch(() => {
         if (cancelled.current) return
-        setError('Audio playback was blocked by the browser.')
+        setError('Audio was blocked by the browser. Use “Try online voice” below to start it from a click.')
         finish()
       })
     }
@@ -106,6 +122,7 @@ export function useReadAloud(lines: string[]) {
     const fallback = () => {
       if (failed || cancelled.current) return
       failed = true
+      browserFailed.current = true
       window.speechSynthesis.cancel()
       playOnline()
     }
@@ -144,10 +161,12 @@ export function useReadAloud(lines: string[]) {
     if (lines.length === 0) return
     cancelled.current = false
     clearTimers()
+    primeAudio()
     setSpeaking(true)
     setError(null)
 
-    if (!browserSupported) {
+    const freshVoices = browserSupported ? window.speechSynthesis.getVoices() : []
+    if (!browserSupported || browserFailed.current || freshVoices.length === 0) {
       playOnline()
       return
     }
@@ -156,7 +175,18 @@ export function useReadAloud(lines: string[]) {
     window.speechSynthesis.resume()
     const timer = window.setTimeout(() => playBrowser(), 80)
     timers.current.push(timer)
-  }, [speaking, lines, browserSupported, clearTimers, playBrowser, playOnline, stop])
+  }, [speaking, lines, browserSupported, clearTimers, primeAudio, playBrowser, playOnline, stop])
+
+  const playWithOnlineVoice = useCallback(() => {
+    cancelled.current = true
+    clearTimers()
+    if (browserSupported) window.speechSynthesis.cancel()
+    cancelled.current = false
+    primeAudio()
+    setSpeaking(true)
+    setError(null)
+    playOnline()
+  }, [browserSupported, clearTimers, primeAudio, playOnline])
 
   useEffect(() => {
     if (!browserSupported) return
@@ -173,5 +203,8 @@ export function useReadAloud(lines: string[]) {
     if (audio.current) audio.current.pause()
   }, [browserSupported])
 
-  return useMemo(() => ({ speaking, error, mode, toggle, stop }), [speaking, error, mode, toggle, stop])
+  return useMemo(
+    () => ({ speaking, error, mode, toggle, stop, playWithOnlineVoice }),
+    [speaking, error, mode, toggle, stop, playWithOnlineVoice],
+  )
 }

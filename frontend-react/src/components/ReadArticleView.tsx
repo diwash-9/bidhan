@@ -88,6 +88,7 @@ export default function ReadArticleView() {
     mode: speechMode,
     toggle: toggleSpeech,
     stop: stopSpeech,
+    playWithOnlineVoice,
   } = useReadAloud(speechLines)
 
   useEffect(() => {
@@ -232,8 +233,15 @@ export default function ReadArticleView() {
       </div>
 
       {speechError && (
-        <div role="alert" className="mb-4 rounded-xl border border-crimson-500/30 bg-crimson-500/10 px-4 py-3 text-xs text-crimson-200">
-          {speechError}
+        <div role="alert" className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-crimson-500/30 bg-crimson-500/10 px-4 py-3 text-xs text-crimson-200">
+          <span>{speechError}</span>
+          <button
+            type="button"
+            onClick={playWithOnlineVoice}
+            className="rounded-lg border border-crimson-400/40 bg-crimson-500/10 px-3 py-1.5 font-bold text-crimson-100 transition hover:bg-crimson-500/25"
+          >
+            Try online voice
+          </button>
         </div>
       )}
 

@@ -12,9 +12,13 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Interactive reader**: per-clause check-offs with a progress bar and jump-to-clause chips, read-aloud (browser voice with online fallback), three text sizes, bookmarks, copyable article/clause links, related-article links, and ←/→ keyboard paging.
 - **Library extras**: Continue reading, Saved for later, a "Surprise me" random article button, and local finished/bookmarked counts.
 
+### Changed
+- **Auth landing page**: two clear paths instead of a small reading link — a prominent "Start reading free" card (every article unlocked, read aloud, bookmarks) and a tabbed Log in / Create account card, plus a "Continue without an account" option and a compact benefits strip. Reading is the first path on mobile too.
+
 ### Fixed
 - **Read-aloud reliability**: pick an available English voice, defer speaking after `cancel()` to avoid Chrome dropping queued utterances, and show a clear message when audio is blocked or the browser has no speech voices.
 - **Read-aloud fallback**: if the browser engine reports `synthesis-failed` or never starts (common on Linux/Chromium without installed voices), playback automatically retries with an online spoken-audio voice; the toolbar shows whether the device or online voice is in use.
+- **Audio autoplay block**: media playback is primed inside the Listen click, the online voice is used directly when no browser voices exist, and a "Try online voice" button retries from a fresh click if a browser still blocks audio. Verified in Chromium with its default user-gesture autoplay policy.
 
 ### Notes
 - Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.

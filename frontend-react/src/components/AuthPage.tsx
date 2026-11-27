@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { ArrowRight, Award, BookOpenCheck, Flame, Heart } from 'lucide-react'
+import { ArrowRight, Award, BookOpenCheck, CheckCircle2, Flame, Heart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import Logo from '@/components/Logo'
@@ -8,21 +8,24 @@ import { useAuthStore } from '@/store/auth'
 
 const HIGHLIGHTS = [
   {
-    icon: BookOpenCheck,
-    title: '308 articles, 35 parts',
-    text: 'The full Constitution as guided, bite-size lessons.',
+    icon: Flame,
+    title: 'Keep the streak alive',
+    text: 'A few minutes a day is all it takes.',
   },
   {
-    icon: Flame,
-    title: 'Streaks, XP & leagues',
-    text: 'Duolingo-style motivation that keeps you coming back.',
+    icon: Award,
+    title: 'XP, levels & leagues',
+    text: 'Small wins that add up to real knowledge.',
   },
   {
     icon: Heart,
-    title: 'Hearts & practice',
-    text: '25 hearts with quick refills, plus free practice mode.',
+    title: 'Learn at your pace',
+    text: 'Hearts, practice mode, and no pressure.',
   },
 ]
+
+const inputClass =
+  'w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 transition focus:border-crimson-500 focus:outline-none focus:ring-2 focus:ring-crimson-500/20'
 
 export default function AuthPage() {
   const { login, register } = useAuthStore()
@@ -32,6 +35,11 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  const switchMode = (next: 'login' | 'register') => {
+    setMode(next)
+    setError(null)
+  }
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -48,147 +56,241 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4 sm:px-6 py-10">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 items-stretch">
-        <section className="relative overflow-hidden rounded-3xl border border-royal-900 bg-gradient-to-br from-royal-950 via-slate-950 to-crimson-950 p-8 sm:p-10 flex flex-col justify-between">
-          <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-crimson-600/20 blur-3xl" />
-          <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-royal-600/20 blur-3xl" />
-          <div className="relative">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex rounded-2xl border border-royal-800 bg-slate-950/70 p-2.5 shadow-lg">
-                <Logo className="w-10 h-10" />
-              </span>
-              <div>
-                <h1 className="text-3xl font-black font-display leading-none">
-                  <span className="text-crimson-400">विधान</span>{' '}
-                  <span className="text-white">Bidhan</span>
-                </h1>
-                <p className="text-sm text-royal-300 mt-1">Learn Nepal&apos;s Constitution</p>
-              </div>
-            </div>
-            <p className="mt-6 text-lg leading-relaxed text-slate-300">
-              Master all <span className="font-bold text-white">308 articles</span> across{' '}
-              <span className="font-bold text-white">35 parts</span> through short lessons,
-              knowledge checks, and friendly competition.
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 left-[10%] h-96 w-96 rounded-full bg-royal-700/20 blur-3xl" />
+        <div className="absolute -bottom-40 right-[10%] h-96 w-96 rounded-full bg-crimson-700/20 blur-3xl" />
+      </div>
+
+      <header className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-6 sm:px-6">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex rounded-2xl border border-royal-800 bg-slate-900/80 p-2 shadow-lg">
+            <Logo className="h-9 w-9" />
+          </span>
+          <div>
+            <p className="font-display text-xl font-black leading-none">
+              <span className="text-crimson-400">विधान</span> <span className="text-white">Bidhan</span>
             </p>
+            <p className="mt-1 text-[11px] text-royal-300">Learn Nepal&apos;s Constitution</p>
           </div>
-          <ul className="relative mt-8 space-y-4">
-            {HIGHLIGHTS.map((h) => (
-              <li key={h.title} className="flex items-start gap-3">
-                <span className="mt-0.5 inline-flex rounded-xl border border-royal-800 bg-slate-900/80 p-2">
-                  <h.icon className="w-5 h-5 text-royal-300" />
-                </span>
-                <span>
-                  <span className="block font-bold text-white text-sm">{h.title}</span>
-                  <span className="block text-sm text-slate-400">{h.text}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="relative mt-8 flex items-center gap-2 text-xs text-slate-500">
-            <Award className="w-4 h-4 text-yellow-400" />
-            Free forever · Built for learners, by learners
+        </div>
+        <Link
+          to="/read"
+          className="flex items-center gap-1.5 rounded-full border border-royal-800 bg-royal-950/40 px-3 py-2 text-xs font-semibold text-royal-200 transition hover:border-royal-600 hover:text-white sm:text-sm"
+        >
+          <span className="hidden sm:inline">Browse free</span>
+          <span className="sm:hidden">Read</span>
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </header>
+
+      <main className="relative mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-royal-800 bg-royal-950/60 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-royal-300">
+            <BookOpenCheck className="h-3.5 w-3.5" aria-hidden="true" /> Two ways in
+          </span>
+          <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
+            Explore the Constitution. Then make it stick.
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
+            Read any article right now — no account needed — or sign in to unlock the guided path,
+            streaks, and a little friendly competition.
           </p>
-        </section>
+        </div>
 
-        <section className="rounded-3xl border border-slate-800 bg-slate-900 p-6 sm:p-8 shadow-2xl flex flex-col justify-center">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold font-display">
-              {mode === 'login' ? 'Welcome back' : 'Create your account'}
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              {mode === 'login'
-                ? 'Pick up right where you left off.'
-                : 'Start your streak in under a minute.'}
-            </p>
-          </div>
+        <div className="mt-9 grid items-stretch gap-5 lg:grid-cols-2">
+          <section className="group relative overflow-hidden rounded-3xl border border-royal-700/70 bg-gradient-to-br from-royal-950 via-slate-900 to-crimson-950 p-6 shadow-2xl shadow-royal-950/40 transition hover:border-royal-500 sm:p-8">
+            <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-crimson-500/20 blur-3xl transition group-hover:bg-crimson-500/30" />
+            <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-royal-500/20 blur-3xl" />
 
-          <form onSubmit={submit} className="space-y-4">
-            {mode === 'register' && (
+            <div className="relative flex h-full flex-col">
+              <div className="flex items-start justify-between gap-3">
+                <span className="inline-flex rounded-2xl border border-royal-700 bg-royal-900/60 p-3 shadow-lg">
+                  <BookOpenCheck className="h-7 w-7 text-royal-200" aria-hidden="true" />
+                </span>
+                <span className="rounded-full border border-emerald-700/50 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-300">
+                  No sign-in needed
+                </span>
+              </div>
+
+              <h2 className="mt-6 font-display text-2xl font-bold sm:text-3xl">Just here to read?</h2>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-300">
+                Open all <span className="font-bold text-white">308 articles</span> instantly. Search,
+                listen along, tick off clauses, and save the ones you want to revisit.
+              </p>
+
+              <ul className="mt-5 space-y-2.5 text-sm text-slate-300">
+                {[
+                  'Every article unlocked from the start',
+                  'Read aloud, resize text, and bookmark',
+                  'Your place saved on this device',
+                ].map((line) => (
+                  <li key={line} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                to="/read"
+                className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-4 text-sm font-bold text-royal-950 shadow-lg shadow-royal-950/40 transition hover:-translate-y-0.5 hover:bg-royal-50 sm:text-base"
+              >
+                Start reading free <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </Link>
+              <p className="mt-3 text-center text-xs text-slate-400">
+                Have a look first. Sign up whenever you&apos;re ready.
+              </p>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-slate-800 bg-slate-900/95 p-6 shadow-2xl sm:p-8">
+            <div role="tablist" aria-label="Account access" className="flex rounded-2xl border border-slate-800 bg-slate-950 p-1">
+              <button
+                id="tab-login"
+                type="button"
+                role="tab"
+                aria-selected={mode === 'login'}
+                aria-controls="auth-form"
+                onClick={() => switchMode('login')}
+                className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-bold transition ${
+                  mode === 'login' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Log in
+              </button>
+              <button
+                id="tab-register"
+                type="button"
+                role="tab"
+                aria-selected={mode === 'register'}
+                aria-controls="auth-form"
+                onClick={() => switchMode('register')}
+                className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-bold transition ${
+                  mode === 'register' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Create account
+              </button>
+            </div>
+
+            <div className="mt-6">
+              <h2 className="font-display text-2xl font-bold">
+                {mode === 'login' ? 'Welcome back' : 'Start your streak'}
+              </h2>
+              <p className="mt-1 text-sm text-slate-400">
+                {mode === 'login'
+                  ? 'Pick up right where you left off.'
+                  : 'Join in under a minute — it’s free.'}
+              </p>
+            </div>
+
+            <form
+              id="auth-form"
+              role="tabpanel"
+              aria-labelledby={mode === 'login' ? 'tab-login' : 'tab-register'}
+              onSubmit={submit}
+              className="mt-5 space-y-4"
+            >
+              {mode === 'register' && (
+                <div>
+                  <label htmlFor="display-name" className="mb-1.5 block text-xs font-semibold text-slate-400">
+                    Display name
+                  </label>
+                  <input
+                    id="display-name"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="What should we call you?"
+                    autoComplete="nickname"
+                    required
+                    className={inputClass}
+                  />
+                </div>
+              )}
               <div>
-                <label htmlFor="display-name" className="block text-xs font-semibold text-slate-400 mb-1.5">
-                  Display name
+                <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-400">
+                  Email address
                 </label>
                 <input
-                  id="display-name"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Display name"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm placeholder:text-slate-600 focus:border-crimson-500 focus:outline-none transition"
+                  className={inputClass}
                 />
               </div>
-            )}
-            <div>
-              <label htmlFor="email" className="block text-xs font-semibold text-slate-400 mb-1.5">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-                required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm placeholder:text-slate-600 focus:border-crimson-500 focus:outline-none transition"
-              />
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-xs font-semibold text-slate-400">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  required
+                  minLength={8}
+                  className={inputClass}
+                />
+              </div>
+
+              {error && (
+                <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full rounded-xl bg-crimson-600 px-5 py-3.5 font-bold text-white shadow-lg shadow-crimson-900/30 transition hover:bg-crimson-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {busy ? 'Please wait…' : mode === 'login' ? 'Log in & continue' : 'Create my account'}
+              </button>
+            </form>
+
+            <div className="mt-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span className="h-px flex-1 bg-slate-800" />
+              Not ready to sign up?
+              <span className="h-px flex-1 bg-slate-800" />
             </div>
-            <div>
-              <label htmlFor="password" className="block text-xs font-semibold text-slate-400 mb-1.5">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                required
-                minLength={8}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm placeholder:text-slate-600 focus:border-crimson-500 focus:outline-none transition"
-              />
-            </div>
-
-            {error && (
-              <p role="alert" className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full bg-crimson-600 hover:bg-crimson-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg shadow-crimson-900/30"
-            >
-              {busy ? 'Please wait…' : mode === 'login' ? 'Log In' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="mt-5 text-center">
             <Link
               to="/read"
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-royal-300 hover:text-white border border-royal-900 hover:border-royal-700 rounded-xl px-4 py-2.5 transition"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-royal-800 bg-royal-950/40 px-5 py-3.5 text-sm font-semibold text-royal-200 transition hover:border-royal-600 hover:bg-royal-900/50 hover:text-white"
             >
-              Just want to read? Open Study mode <ArrowRight className="w-4 h-4" />
+              Continue without an account <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-          </div>
+          </section>
+        </div>
 
-          <p className="text-center text-sm text-slate-400 mt-6">
-            {mode === 'login' ? "Don't have an account? " : 'Already registered? '}
-            <button
-              onClick={() => {
-                setMode(mode === 'login' ? 'register' : 'login')
-                setError(null)
-              }}
-              className="font-semibold text-crimson-400 hover:text-crimson-300 hover:underline transition"
+        <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+          {HIGHLIGHTS.map((h) => (
+            <li
+              key={h.title}
+              className="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4"
             >
-              {mode === 'login' ? 'Sign up' : 'Log in'}
-            </button>
-          </p>
-        </section>
-      </div>
+              <span className="inline-flex shrink-0 rounded-xl border border-royal-800 bg-slate-950 p-2">
+                <h.icon className="h-5 w-5 text-royal-300" aria-hidden="true" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold text-slate-100">{h.title}</span>
+                <span className="block text-xs text-slate-400">{h.text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500">
+          <Award className="h-4 w-4 text-yellow-400" aria-hidden="true" />
+          Free forever · Built for learners, by learners
+        </p>
+      </main>
     </div>
   )
 }

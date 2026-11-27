@@ -56,7 +56,7 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 - **Study mode (no sign-in needed)** — browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP — game progress is untouched.
 - **Weekly quest & leaderboard** — a 100 XP weekly goal with a live progress bar, plus
   weekly-first and all-time rankings.
-- **User accounts** — secure signup/login with JWT access + refresh tokens and per-user progress.
+- **User accounts** — secure signup/login with JWT access + refresh tokens and per-user progress; the landing page leads with a prominent no-sign-in reading option for visitors who just want to explore.
 - **Instant search** — full-text search across article titles and content.
 - **Content administration** — role-gated admin panel for articles, clauses, dependencies, and
   quiz questions, with an audited amendment trail.
