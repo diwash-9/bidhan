@@ -58,8 +58,12 @@ export default function ReadArticleView() {
   const [font, setFont] = useState<ReaderFont>(() => getReaderFont())
   const [copied, setCopied] = useState(false)
   const [speaking, setSpeaking] = useState(false)
+  const [speechError, setSpeechError] = useState<string | null>(null)
   const [celebrate, setCelebrate] = useState(false)
   const wasFinished = useRef(false)
+  const voices = useRef<SpeechSynthesisVoice[]>([])
+  const speechTimer = useRef<number | null>(null)
+  const speechWatchdog = useRef<number | null>(null)
 
   const total = article?.clauses.length ?? 0
   const readCount = useMemo(
@@ -70,9 +74,31 @@ export default function ReadArticleView() {
   const isSaved = savedArticles.includes(articleId)
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
 
+  const clearSpeechTimers = useCallback(() => {
+    if (speechTimer.current !== null) {
+      window.clearTimeout(speechTimer.current)
+      speechTimer.current = null
+    }
+    if (speechWatchdog.current !== null) {
+      window.clearTimeout(speechWatchdog.current)
+      speechWatchdog.current = null
+    }
+  }, [])
+
   const stopSpeech = useCallback(() => {
+    clearSpeechTimers()
     if (speechSupported) window.speechSynthesis.cancel()
     setSpeaking(false)
+  }, [speechSupported, clearSpeechTimers])
+
+  useEffect(() => {
+    if (!speechSupported) return
+    const loadVoices = () => {
+      voices.current = window.speechSynthesis.getVoices()
+    }
+    loadVoices()
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
   }, [speechSupported])
 
   useEffect(() => {
@@ -80,13 +106,15 @@ export default function ReadArticleView() {
     setSavedArticles(getSavedArticles())
     setFont(getReaderFont())
     setCopied(false)
+    setSpeechError(null)
     wasFinished.current = false
     stopSpeech()
   }, [articleId, stopSpeech])
 
   useEffect(() => () => {
+    clearSpeechTimers()
     if (speechSupported) window.speechSynthesis.cancel()
-  }, [speechSupported])
+  }, [speechSupported, clearSpeechTimers])
 
   useEffect(() => {
     if (!copied) return
@@ -133,6 +161,13 @@ export default function ReadArticleView() {
       stopSpeech()
       return
     }
+
+    clearSpeechTimers()
+    setSpeechError(null)
+    // Chrome can swallow utterances queued in the same tick as cancel().
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.resume()
+
     const lines = [
       `Article ${article.article_number}. ${article.title}.`,
       ...article.clauses.flatMap((clause) => [
@@ -140,19 +175,47 @@ export default function ReadArticleView() {
         ...clause.sub_clauses.map((sub) => sub.content),
       ]),
     ]
-    window.speechSynthesis.cancel()
-    lines.forEach((line, i) => {
-      const utterance = new SpeechSynthesisUtterance(line)
-      utterance.lang = 'en-US'
-      utterance.rate = 0.95
-      if (i === lines.length - 1) {
-        utterance.onend = () => setSpeaking(false)
-        utterance.onerror = () => setSpeaking(false)
-      }
-      window.speechSynthesis.speak(utterance)
-    })
+    const englishVoice = voices.current.find((voice) => voice.lang.toLowerCase().startsWith('en')) ?? voices.current[0]
+
+    speechTimer.current = window.setTimeout(() => {
+      speechTimer.current = null
+      lines.forEach((line, i) => {
+        const utterance = new SpeechSynthesisUtterance(line)
+        utterance.lang = 'en-US'
+        if (englishVoice) utterance.voice = englishVoice
+        utterance.rate = 0.95
+        utterance.volume = 1
+        if (i === 0) {
+          utterance.onstart = () => {
+            if (speechWatchdog.current !== null) {
+              window.clearTimeout(speechWatchdog.current)
+              speechWatchdog.current = null
+            }
+          }
+        }
+        if (i === lines.length - 1) {
+          utterance.onend = () => {
+            clearSpeechTimers()
+            setSpeaking(false)
+          }
+          utterance.onerror = (event) => {
+            clearSpeechTimers()
+            setSpeaking(false)
+            if (event.error !== 'interrupted' && event.error !== 'canceled') {
+              setSpeechError(`Speech playback failed (${event.error}). Check your browser's speech voices.`)
+            }
+          }
+        }
+        window.speechSynthesis.speak(utterance)
+      })
+      speechWatchdog.current = window.setTimeout(() => {
+        speechWatchdog.current = null
+        setSpeaking(false)
+        setSpeechError('Audio did not start. This browser may have no speech voices installed, or audio may be blocked.')
+      }, 3000)
+    }, 80)
     setSpeaking(true)
-  }, [article, speaking, speechSupported, stopSpeech])
+  }, [article, speaking, speechSupported, stopSpeech, clearSpeechTimers])
 
   const copyLink = useCallback(
     async (clauseId?: number) => {
@@ -242,6 +305,12 @@ export default function ReadArticleView() {
           </button>
         </div>
       </div>
+
+      {speechError && (
+        <div role="alert" className="mb-4 rounded-xl border border-crimson-500/30 bg-crimson-500/10 px-4 py-3 text-xs text-crimson-200">
+          {speechError}
+        </div>
+      )}
 
       <header className="mb-6">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-royal-300">
