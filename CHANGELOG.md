@@ -9,11 +9,12 @@ Reading the Constitution no longer requires an account, and the reader is now an
 
 ### Added
 - **Guest access**: `/read` and `/read/:articleId` are public. Guests get a Study-only header with a Sign in link, and the auth screen links directly to reading. Game routes stay login-gated and unchanged.
-- **Interactive reader**: per-clause check-offs with a progress bar and jump-to-clause chips, read-aloud via browser speech synthesis, three text sizes, bookmarks, copyable article/clause links, related-article links, and ←/→ keyboard paging.
+- **Interactive reader**: per-clause check-offs with a progress bar and jump-to-clause chips, read-aloud (browser voice with online fallback), three text sizes, bookmarks, copyable article/clause links, related-article links, and ←/→ keyboard paging.
 - **Library extras**: Continue reading, Saved for later, a "Surprise me" random article button, and local finished/bookmarked counts.
 
 ### Fixed
 - **Read-aloud reliability**: pick an available English voice, defer speaking after `cancel()` to avoid Chrome dropping queued utterances, and show a clear message when audio is blocked or the browser has no speech voices.
+- **Read-aloud fallback**: if the browser engine reports `synthesis-failed` or never starts (common on Linux/Chromium without installed voices), playback automatically retries with an online spoken-audio voice; the toolbar shows whether the device or online voice is in use.
 
 ### Notes
 - Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.

@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import Confetti from '@/components/Confetti'
 import { useAllArticles, useArticle } from '@/hooks/useApi'
+import { useReadAloud } from '@/hooks/useReadAloud'
 import {
   getReadClauses,
   getReaderFont,
@@ -57,13 +58,8 @@ export default function ReadArticleView() {
   const [savedArticles, setSavedArticles] = useState<string[]>(() => getSavedArticles())
   const [font, setFont] = useState<ReaderFont>(() => getReaderFont())
   const [copied, setCopied] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
-  const [speechError, setSpeechError] = useState<string | null>(null)
   const [celebrate, setCelebrate] = useState(false)
   const wasFinished = useRef(false)
-  const voices = useRef<SpeechSynthesisVoice[]>([])
-  const speechTimer = useRef<number | null>(null)
-  const speechWatchdog = useRef<number | null>(null)
 
   const total = article?.clauses.length ?? 0
   const readCount = useMemo(
@@ -72,49 +68,36 @@ export default function ReadArticleView() {
   )
   const finished = total > 0 && readCount === total
   const isSaved = savedArticles.includes(articleId)
-  const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
 
-  const clearSpeechTimers = useCallback(() => {
-    if (speechTimer.current !== null) {
-      window.clearTimeout(speechTimer.current)
-      speechTimer.current = null
-    }
-    if (speechWatchdog.current !== null) {
-      window.clearTimeout(speechWatchdog.current)
-      speechWatchdog.current = null
-    }
-  }, [])
-
-  const stopSpeech = useCallback(() => {
-    clearSpeechTimers()
-    if (speechSupported) window.speechSynthesis.cancel()
-    setSpeaking(false)
-  }, [speechSupported, clearSpeechTimers])
-
-  useEffect(() => {
-    if (!speechSupported) return
-    const loadVoices = () => {
-      voices.current = window.speechSynthesis.getVoices()
-    }
-    loadVoices()
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
-  }, [speechSupported])
+  const speechLines = useMemo(
+    () =>
+      article
+        ? [
+            `Article ${article.article_number}. ${article.title}.`,
+            ...article.clauses.flatMap((clause) => [
+              clause.content,
+              ...clause.sub_clauses.map((sub) => sub.content),
+            ]),
+          ]
+        : [],
+    [article],
+  )
+  const {
+    speaking,
+    error: speechError,
+    mode: speechMode,
+    toggle: toggleSpeech,
+    stop: stopSpeech,
+  } = useReadAloud(speechLines)
 
   useEffect(() => {
     setReadClauses(getReadClauses(articleId))
     setSavedArticles(getSavedArticles())
     setFont(getReaderFont())
     setCopied(false)
-    setSpeechError(null)
     wasFinished.current = false
     stopSpeech()
   }, [articleId, stopSpeech])
-
-  useEffect(() => () => {
-    clearSpeechTimers()
-    if (speechSupported) window.speechSynthesis.cancel()
-  }, [speechSupported, clearSpeechTimers])
 
   useEffect(() => {
     if (!copied) return
@@ -154,68 +137,6 @@ export default function ReadArticleView() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [navigate, previous, next])
-
-  const toggleSpeech = useCallback(() => {
-    if (!article || !speechSupported) return
-    if (speaking) {
-      stopSpeech()
-      return
-    }
-
-    clearSpeechTimers()
-    setSpeechError(null)
-    // Chrome can swallow utterances queued in the same tick as cancel().
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.resume()
-
-    const lines = [
-      `Article ${article.article_number}. ${article.title}.`,
-      ...article.clauses.flatMap((clause) => [
-        clause.content,
-        ...clause.sub_clauses.map((sub) => sub.content),
-      ]),
-    ]
-    const englishVoice = voices.current.find((voice) => voice.lang.toLowerCase().startsWith('en')) ?? voices.current[0]
-
-    speechTimer.current = window.setTimeout(() => {
-      speechTimer.current = null
-      lines.forEach((line, i) => {
-        const utterance = new SpeechSynthesisUtterance(line)
-        utterance.lang = 'en-US'
-        if (englishVoice) utterance.voice = englishVoice
-        utterance.rate = 0.95
-        utterance.volume = 1
-        if (i === 0) {
-          utterance.onstart = () => {
-            if (speechWatchdog.current !== null) {
-              window.clearTimeout(speechWatchdog.current)
-              speechWatchdog.current = null
-            }
-          }
-        }
-        if (i === lines.length - 1) {
-          utterance.onend = () => {
-            clearSpeechTimers()
-            setSpeaking(false)
-          }
-          utterance.onerror = (event) => {
-            clearSpeechTimers()
-            setSpeaking(false)
-            if (event.error !== 'interrupted' && event.error !== 'canceled') {
-              setSpeechError(`Speech playback failed (${event.error}). Check your browser's speech voices.`)
-            }
-          }
-        }
-        window.speechSynthesis.speak(utterance)
-      })
-      speechWatchdog.current = window.setTimeout(() => {
-        speechWatchdog.current = null
-        setSpeaking(false)
-        setSpeechError('Audio did not start. This browser may have no speech voices installed, or audio may be blocked.')
-      }, 3000)
-    }, 80)
-    setSpeaking(true)
-  }, [article, speaking, speechSupported, stopSpeech, clearSpeechTimers])
 
   const copyLink = useCallback(
     async (clauseId?: number) => {
@@ -260,13 +181,17 @@ export default function ReadArticleView() {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <button
             onClick={toggleSpeech}
-            disabled={!speechSupported}
             aria-pressed={speaking}
-            title={speechSupported ? 'Read this article aloud' : 'Audio playback is not supported in this browser'}
-            className="flex items-center gap-1.5 rounded-full border border-royal-800 bg-royal-950/40 px-3 py-1.5 text-xs font-semibold text-royal-200 hover:bg-royal-900/60 transition disabled:opacity-50"
+            title="Read this article aloud (uses an online voice if this browser has no working speech voices)"
+            className="flex items-center gap-1.5 rounded-full border border-royal-800 bg-royal-950/40 px-3 py-1.5 text-xs font-semibold text-royal-200 hover:bg-royal-900/60 transition"
           >
             {speaking ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             <span className="hidden sm:inline">{speaking ? 'Stop' : 'Listen'}</span>
+            {speaking && (
+              <span className="hidden text-[10px] font-normal text-royal-400/80 md:inline">
+                {speechMode === 'online' ? 'online voice' : 'device voice'}
+              </span>
+            )}
           </button>
           <div className="flex items-center gap-1 rounded-full border border-slate-800 bg-slate-950 px-1 py-1" role="group" aria-label="Text size">
             <Type className="w-3.5 h-3.5 text-slate-500 mx-1" aria-hidden="true" />

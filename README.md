@@ -53,7 +53,7 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 - **Gamification** — XP (+5/answer, +15/lesson, +4/practice), streaks, leagues, sound, and
   celebrations.
 - **Practice mode** — replay any completed lesson for reduced XP with zero heart cost.
-- **Study mode (no sign-in needed)** — browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud, resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP — game progress is untouched.
+- **Study mode (no sign-in needed)** — browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP — game progress is untouched.
 - **Weekly quest & leaderboard** — a 100 XP weekly goal with a live progress bar, plus
   weekly-first and all-time rankings.
 - **User accounts** — secure signup/login with JWT access + refresh tokens and per-user progress.
