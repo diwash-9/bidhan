@@ -28,7 +28,9 @@ knowledge with 1,200+ graded quiz questions.
 Bidhan makes Nepal's constitution approachable through the mechanics of a language-learning
 game: follow a **branching unlock path**, complete two-phase lessons (**read → knowledge
 check**), climb global and weekly leaderboards, and maintain a streak — while the content
-remains a faithful rendering of the official 2015 English translation.
+remains a faithful rendering of the official 2015 English translation. Visitors who just
+want to read can open every article at `/read` without creating an account; game features
+stay login-gated.
 
 The project is split into a React SPA and a FastAPI backend with a PostgreSQL database:
 
@@ -63,6 +65,30 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 - **Fast on free-tier hosting** — bulk progress materialization, bulk unlocks, N+1-free
   article loads, part-scoped progress fetching, and a sub-KB progress-summary endpoint keep
   first login and every lesson load snappy even on high-latency databases.
+
+## Read the Constitution without an account
+
+`/read` and `/read/:articleId` are public. The landing page leads with **Start reading
+free**, and the header shows a Study tab plus a Sign in link for guests.
+
+- **Library** — search by article number, title, or part; filter by part; open any of the
+  308 articles. **Surprise me** opens a random one, and Continue reading / Saved for later
+  use your device-local history.
+- **Reader** — tick clauses off as you go, watch the progress bar, jump to a clause, resize
+  text, bookmark the article, copy deep links to it or a clause, follow related-article
+  links, and flip between articles with ← / →.
+- **Read aloud** — prefers a voice installed on the device. If the browser has no working
+  voices or blocks playback, it falls back to an online voice; a **Try online voice** button
+  retries from a fresh click. The online voice sends the article text to Google Translate's
+  public TTS endpoint, so it requires an internet connection.
+- **Local only** — clause ticks, bookmarks, finished articles, text size, and the last-read
+  article live in this browser's `localStorage`. There is no account and no server-side
+  reading state.
+- **No game impact** — Study mode never calls quiz, completion, or heart APIs and never
+  changes unlocks, XP, streaks, or hearts.
+
+These routes use the public content endpoints `GET /api/articles` and
+`GET /api/articles/{id}`; no backend or database changes were needed.
 
 ## Tech stack
 
@@ -132,17 +158,20 @@ cp .env.example backend/.env
 ## API overview
 
 Interactive docs are served at `/docs` (production:
-https://bidhan-api.onrender.com/docs). All `/api/*` routes except health/register/login/refresh
-require `Authorization: Bearer <access_token>`.
+https://bidhan-api.onrender.com/docs). Public routes are health, register/login/refresh,
+content reads (`GET /api/parts`, `GET /api/parts/{n}/articles`, `GET /api/articles`,
+`GET /api/articles/{id}`, `GET /api/articles/{id}/quiz`), search, and the leaderboard.
+`GET /api/auth/me`, all progress/gameplay routes, and all admin routes require
+`Authorization: Bearer <access_token>`.
 
 | Area | Endpoints |
 |---|---|
 | Health | `GET /api/health` |
 | Auth | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/refresh`, `GET /api/auth/me` |
-| Content | `GET /api/parts`, `GET /api/parts/{n}/articles`, `GET /api/articles/{id}`, `GET /api/articles/{id}/quiz` |
+| Content (public) | `GET /api/parts`, `GET /api/parts/{n}/articles`, `GET /api/articles`, `GET /api/articles/{id}`, `GET /api/articles/{id}/quiz` |
 | Progress | `GET /api/users/{id}/progress[?part_number=N][?brief=true]`, `GET /api/users/{id}/progress/summary[?article_id=ART-N]` |
 | Gameplay | `POST /api/users/{id}/quiz/{qid}/attempt[?practice=1]`, `POST /api/users/{id}/articles/{aid}/complete`, `POST /api/users/{id}/hearts/use` |
-| Social | `GET /api/leaderboard?window=all\|week`, `GET /api/search?q=…` |
+| Social (public) | `GET /api/leaderboard?window=all\|week`, `GET /api/search?q=…` |
 | Admin (`role=admin`) | `GET/POST /api/admin/articles…`, `POST /api/admin/articles/{id}/amend`, `GET /api/admin/revisions` |
 
 Game rules: correct answer **+5 XP**, lesson finish **+15 XP**, practice **+4 XP** (no hearts);

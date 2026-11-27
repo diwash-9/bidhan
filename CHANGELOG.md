@@ -23,6 +23,9 @@ Reading the Constitution no longer requires an account, and the reader is now an
 ### Notes
 - Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.
 
+### Docs
+- README now documents public Study routes, device-local reading state, read-aloud behavior (including the third-party online voice), and which API endpoints are public vs authenticated. SECURITY notes the `localStorage` and third-party TTS implications.
+
 ### Verified
 - Frontend `typecheck`, `lint`, `build` clean.
 

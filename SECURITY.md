@@ -49,6 +49,12 @@ Out of scope:
 - The rate limiter is **per-process and in-memory**; scaling to multiple replicas requires a
   shared store before raising the per-instance limit.
 - Free-tier hosting wakes from idle on first request (see the repo's keep-alive setup).
+- Study mode keeps clause ticks, bookmarks, and reading preferences in the browser's
+  `localStorage`. This data is device-local, is not tied to an account, and disappears if
+  site data is cleared; it never affects server-side game progress.
+- The reader's read-aloud feature prefers device voices, but falls back to Google Translate's
+  public TTS endpoint when no voice works. That fallback sends the article text to a third
+  party and requires an internet connection.
 
 ## Supported versions
 
