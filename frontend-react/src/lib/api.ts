@@ -4,6 +4,7 @@ import type {
   AdminArticle,
   ArticleDetail,
   ArticleSummary,
+  CatalogArticle,
   CompleteResult,
   HeartsState,
   LeaderboardEntry,
@@ -93,6 +94,10 @@ export const api = {
   },
   getArticles(partNumber: number): Promise<ArticleSummary[]> {
     return request(`/parts/${partNumber}/articles`)
+  },
+  /** All articles in one request for the Study library (no progress fields). */
+  getAllArticles(): Promise<CatalogArticle[]> {
+    return request('/articles')
   },
   getArticle(id: string): Promise<ArticleDetail> {
     return request(`/articles/${id}`)

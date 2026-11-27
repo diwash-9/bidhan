@@ -13,6 +13,8 @@ export default function Header() {
   // Lightweight (<0.5KB) instead of the 308-row full progress payload.
   const { data: progress, refetch } = useProgressSummary()
   const location = useLocation()
+  // Study mode is read-only: game stats would be misleading there.
+  const studyMode = location.pathname.startsWith('/read')
   const [soundMuted, setMuted] = useState(isSoundMuted())
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function Header() {
 
   const tabs = [
     { to: '/', label: 'Path' },
+    { to: '/read', label: 'Study' },
     { to: '/leaderboard', label: 'Leaderboard' },
     { to: '/profile', label: 'Profile' },
     ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
@@ -76,37 +79,41 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-1.5 sm:gap-3">
-        <div
-          className="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full"
-          title="Day streak"
-        >
-          <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
-          <span className="font-bold text-sm">{progress?.current_streak ?? user?.current_streak ?? 0}</span>
-        </div>
-        <div
-          className="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full"
-          title="Total XP"
-        >
-          <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-          <span className="font-bold text-sm">{progress?.total_xp ?? user?.total_xp ?? 0}</span>
-        </div>
-        <span className="relative group">
-          <div
-            className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full cursor-default"
-            title={heartsFull ? 'Hearts full' : 'Hearts refill over time'}
-          >
-            <Heart className="w-5 h-5 text-crimson-500 fill-crimson-500" />
-            <span className="font-bold text-sm">
-              {heartsLeft}/{maxHearts}
+        {!studyMode && (
+          <>
+            <div
+              className="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full"
+              title="Day streak"
+            >
+              <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
+              <span className="font-bold text-sm">{progress?.current_streak ?? user?.current_streak ?? 0}</span>
+            </div>
+            <div
+              className="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full"
+              title="Total XP"
+            >
+              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              <span className="font-bold text-sm">{progress?.total_xp ?? user?.total_xp ?? 0}</span>
+            </div>
+            <span className="relative group">
+              <div
+                className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full cursor-default"
+                title={heartsFull ? 'Hearts full' : 'Hearts refill over time'}
+              >
+                <Heart className="w-5 h-5 text-crimson-500 fill-crimson-500" />
+                <span className="font-bold text-sm">
+                  {heartsLeft}/{maxHearts}
+                </span>
+              </div>
+              {!heartsFull && progress?.hearts_refill_at && (
+                <span className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-800 border border-royal-800 text-royal-200 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition pointer-events-none shadow-xl z-50">
+                  Next heart in{' '}
+                  <RefillCountdown refillAt={progress.hearts_refill_at} onExpire={() => void refetch()} className="text-crimson-300 font-bold" />
+                </span>
+              )}
             </span>
-          </div>
-          {!heartsFull && progress?.hearts_refill_at && (
-            <span className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-800 border border-royal-800 text-royal-200 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition pointer-events-none shadow-xl z-50">
-              Next heart in{' '}
-              <RefillCountdown refillAt={progress.hearts_refill_at} onExpire={() => void refetch()} className="text-crimson-300 font-bold" />
-            </span>
-          )}
-        </span>
+          </>
+        )}
         <button
           onClick={toggleSound}
           aria-label={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
@@ -154,16 +161,18 @@ export default function Header() {
                 {t.label}
               </Link>
             ))}
-            <div className="flex items-center gap-3 px-4 pt-3 mt-1 border-t border-royal-950 text-sm">
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                {progress?.current_streak ?? user?.current_streak ?? 0}
-              </span>
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                {progress?.total_xp ?? user?.total_xp ?? 0} XP
-              </span>
-            </div>
+            {!studyMode && (
+              <div className="flex items-center gap-3 px-4 pt-3 mt-1 border-t border-royal-950 text-sm">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                  {progress?.current_streak ?? user?.current_streak ?? 0}
+                </span>
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  {progress?.total_xp ?? user?.total_xp ?? 0} XP
+                </span>
+              </div>
+            )}
           </div>
         </nav>
       )}

@@ -3,6 +3,21 @@
 All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com). Versioning follows semantic intent (pre-1.0).
 
+## [Unreleased]: Study mode — read any article
+
+A read-only way to explore the Constitution without touching game progress.
+
+### Added
+- **Study tab** (`/read`): browsable library of all 308 articles across 35 parts, with text search and a part filter. Every article is open — no unlocks, no lock icons.
+- **Article reader** (`/read/:articleId`): comfortable, clause-by-clause reading view with sub-clauses and previous/next article navigation.
+- Game stats (hearts, streak, XP) are hidden on Study routes; quiz, completion, and heart APIs are never called from Study mode.
+
+### Notes
+- Frontend-only: reuses the existing public content endpoints (`GET /api/articles`, `GET /api/articles/{id}`). No backend, database, or migration changes; game routes and unlock logic are untouched.
+
+### Verified
+- Frontend `typecheck`, `lint`, `build` clean; backend source compiles unchanged.
+
 ## [Unreleased]: Professional UI polish
 
 Showcase-ready visual pass with zero logic changes (all data hooks, routes, and

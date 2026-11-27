@@ -10,6 +10,8 @@ import LeaderboardView from '@/components/LeaderboardView'
 import LessonView from '@/components/LessonView'
 import PathView from '@/components/PathView'
 import ProfileView from '@/components/ProfileView'
+import ReadArticleView from '@/components/ReadArticleView'
+import ReadView from '@/components/ReadView'
 import { useAuthStore } from '@/store/auth'
 
 const queryClient = new QueryClient({
@@ -75,6 +77,8 @@ export default function App() {
         <Route element={<RequireAuth />}>
           <Route element={<Shell />}>
             <Route path="/" element={<PathView />} />
+            <Route path="/read" element={<ReadView />} />
+            <Route path="/read/:articleId" element={<ReadArticleView />} />
             <Route path="/lesson/:articleId" element={<LessonView />} />
             <Route path="/leaderboard" element={<LeaderboardView />} />
             <Route path="/profile" element={<ProfileView />} />

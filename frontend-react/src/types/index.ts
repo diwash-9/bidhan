@@ -35,6 +35,15 @@ export interface ArticleSummary {
   stars: number
 }
 
+/** Shape returned by the unfiltered content list (no progress fields). */
+export interface CatalogArticle {
+  id: string
+  article_number: number
+  title: string
+  part_number: number
+  part_title: string
+}
+
 export interface SubClause {
   identifier: string
   content: string

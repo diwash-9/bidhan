@@ -23,6 +23,16 @@ export function useArticles(partNumber: number | null) {
   })
 }
 
+/** Static content catalog shared by the Study library and article reader. */
+export function useAllArticles() {
+  return useQuery({
+    queryKey: ['all-articles'],
+    queryFn: api.getAllArticles,
+    staleTime: Infinity,
+    gcTime: 60 * 60 * 1000,
+  })
+}
+
 export function useArticle(articleId: string | null) {
   return useQuery({
     queryKey: ['article', articleId],
@@ -153,6 +163,7 @@ export function useAmendArticle() {
       void queryClient.invalidateQueries({ queryKey: ['admin-revisions'] })
       void queryClient.invalidateQueries({ queryKey: ['admin-articles'] })
       void queryClient.invalidateQueries({ queryKey: ['articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['all-articles'] })
       void queryClient.invalidateQueries({ queryKey: ['parts'] })
     },
   })
@@ -166,6 +177,7 @@ export function useCreateArticle() {
       void queryClient.invalidateQueries({ queryKey: ['admin-revisions'] })
       void queryClient.invalidateQueries({ queryKey: ['admin-articles'] })
       void queryClient.invalidateQueries({ queryKey: ['articles'] })
+      void queryClient.invalidateQueries({ queryKey: ['all-articles'] })
       void queryClient.invalidateQueries({ queryKey: ['parts'] })
     },
   })
