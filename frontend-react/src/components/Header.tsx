@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Flame, Heart, LogOut, Menu, Star, Volume2, VolumeX, X } from 'lucide-react'
+import { Flame, Heart, LogIn, LogOut, Menu, Star, Volume2, VolumeX, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import RefillCountdown from '@/components/RefillCountdown'
@@ -13,8 +13,9 @@ export default function Header() {
   // Lightweight (<0.5KB) instead of the 308-row full progress payload.
   const { data: progress, refetch } = useProgressSummary()
   const location = useLocation()
-  // Study mode is read-only: game stats would be misleading there.
-  const studyMode = location.pathname.startsWith('/read')
+  // Guests can only use Study mode; game stats would be misleading there.
+  const isGuest = !user
+  const readOnly = isGuest || location.pathname.startsWith('/read')
   const [soundMuted, setMuted] = useState(isSoundMuted())
 
   useEffect(() => {
@@ -31,13 +32,15 @@ export default function Header() {
   const maxHearts = progress?.max_hearts ?? 25
   const heartsFull = heartsLeft >= maxHearts
 
-  const tabs = [
-    { to: '/', label: 'Path' },
-    { to: '/read', label: 'Study' },
-    { to: '/leaderboard', label: 'Leaderboard' },
-    { to: '/profile', label: 'Profile' },
-    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
-  ]
+  const tabs = isGuest
+    ? [{ to: '/read', label: 'Study' }]
+    : [
+        { to: '/', label: 'Path' },
+        { to: '/read', label: 'Study' },
+        { to: '/leaderboard', label: 'Leaderboard' },
+        { to: '/profile', label: 'Profile' },
+        ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
+      ]
   const isActive = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to))
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -48,7 +51,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b-2 border-royal-950 bg-gradient-to-r from-crimson-950/60 via-slate-950 to-royal-950/60 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center gap-2 sm:gap-4">
-      <Link to="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
+      <Link to={isGuest ? '/read' : '/'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
         <Logo />
         <div className="min-w-0">
           <h1 className="font-display font-black text-lg sm:text-xl leading-none group-hover:opacity-90 transition truncate">
@@ -79,7 +82,7 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-1.5 sm:gap-3">
-        {!studyMode && (
+        {!readOnly && (
           <>
             <div
               className="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 sm:px-3 py-1.5 rounded-full"
@@ -114,23 +117,37 @@ export default function Header() {
             </span>
           </>
         )}
-        <button
-          onClick={toggleSound}
-          aria-label={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
-          aria-pressed={soundMuted}
-          className="flex items-center gap-1.5 text-slate-400 hover:text-white p-1.5 sm:px-2 sm:py-1.5 rounded-full hover:bg-royal-900/60 transition"
-          title={soundMuted ? 'Sound off' : 'Sound on'}
-        >
-          {soundMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-        </button>
-        <button
-          onClick={logout}
-          aria-label="Log out"
-          className="flex items-center gap-1.5 text-slate-400 hover:text-white p-1.5 sm:px-2 sm:py-1.5 rounded-full hover:bg-royal-900/60 transition"
-          title="Log out"
-        >
-          <LogOut className="w-5 h-5" />
-        </button>
+        {!readOnly && (
+          <button
+            onClick={toggleSound}
+            aria-label={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+            aria-pressed={soundMuted}
+            className="flex items-center gap-1.5 text-slate-400 hover:text-white p-1.5 sm:px-2 sm:py-1.5 rounded-full hover:bg-royal-900/60 transition"
+            title={soundMuted ? 'Sound off' : 'Sound on'}
+          >
+            {soundMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </button>
+        )}
+        {isGuest ? (
+          <Link
+            to="/auth"
+            aria-label="Sign in"
+            title="Sign in to play"
+            className="flex items-center gap-1.5 text-slate-300 hover:text-white p-1.5 sm:px-2 sm:py-1.5 rounded-full hover:bg-royal-900/60 transition"
+          >
+            <LogIn className="w-5 h-5" />
+            <span className="hidden sm:inline text-sm font-semibold">Sign in</span>
+          </Link>
+        ) : (
+          <button
+            onClick={logout}
+            aria-label="Log out"
+            className="flex items-center gap-1.5 text-slate-400 hover:text-white p-1.5 sm:px-2 sm:py-1.5 rounded-full hover:bg-royal-900/60 transition"
+            title="Log out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        )}
         <button
           onClick={() => setMenuOpen((o) => !o)}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -161,7 +178,7 @@ export default function Header() {
                 {t.label}
               </Link>
             ))}
-            {!studyMode && (
+            {!readOnly && (
               <div className="flex items-center gap-3 px-4 pt-3 mt-1 border-t border-royal-950 text-sm">
                 <span className="flex items-center gap-1.5 text-slate-300">
                   <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />

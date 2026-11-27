@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Award, BookOpenCheck, Flame, Heart } from 'lucide-react'
+import { ArrowRight, Award, BookOpenCheck, Flame, Heart } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import Logo from '@/components/Logo'
 import { useAuthStore } from '@/store/auth'
@@ -164,6 +165,15 @@ export default function AuthPage() {
               {busy ? 'Please wait…' : mode === 'login' ? 'Log In' : 'Create Account'}
             </button>
           </form>
+
+          <div className="mt-5 text-center">
+            <Link
+              to="/read"
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-royal-300 hover:text-white border border-royal-900 hover:border-royal-700 rounded-xl px-4 py-2.5 transition"
+            >
+              Just want to read? Open Study mode <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
 
           <p className="text-center text-sm text-slate-400 mt-6">
             {mode === 'login' ? "Don't have an account? " : 'Already registered? '}

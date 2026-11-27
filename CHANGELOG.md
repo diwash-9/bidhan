@@ -3,6 +3,21 @@
 All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com). Versioning follows semantic intent (pre-1.0).
 
+## [Unreleased]: Public, interactive reading mode
+
+Reading the Constitution no longer requires an account, and the reader is now an active experience.
+
+### Added
+- **Guest access**: `/read` and `/read/:articleId` are public. Guests get a Study-only header with a Sign in link, and the auth screen links directly to reading. Game routes stay login-gated and unchanged.
+- **Interactive reader**: per-clause check-offs with a progress bar and jump-to-clause chips, read-aloud via browser speech synthesis, three text sizes, bookmarks, copyable article/clause links, related-article links, and ←/→ keyboard paging.
+- **Library extras**: Continue reading, Saved for later, a "Surprise me" random article button, and local finished/bookmarked counts.
+
+### Notes
+- Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.
+
+### Verified
+- Frontend `typecheck`, `lint`, `build` clean.
+
 ## [Unreleased]: Study mode — read any article
 
 A read-only way to explore the Constitution without touching game progress.

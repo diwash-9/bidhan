@@ -64,6 +64,12 @@ function AuthGate() {
   return <AuthPage />
 }
 
+function AppFallback() {
+  const { user, loading } = useAuthStore()
+  if (loading) return <div className="min-h-screen bg-slate-950" />
+  return <Navigate to={user ? '/' : '/read'} replace />
+}
+
 export default function App() {
   const { restore } = useAuthStore()
   useEffect(() => {
@@ -77,12 +83,15 @@ export default function App() {
         <Route element={<RequireAuth />}>
           <Route element={<Shell />}>
             <Route path="/" element={<PathView />} />
-            <Route path="/read" element={<ReadView />} />
-            <Route path="/read/:articleId" element={<ReadArticleView />} />
             <Route path="/lesson/:articleId" element={<LessonView />} />
             <Route path="/leaderboard" element={<LeaderboardView />} />
             <Route path="/profile" element={<ProfileView />} />
           </Route>
+        </Route>
+        {/* Study mode is public: anyone can read the Constitution as a guest. */}
+        <Route element={<Shell />}>
+          <Route path="/read" element={<ReadView />} />
+          <Route path="/read/:articleId" element={<ReadArticleView />} />
         </Route>
         <Route element={<RequireAdmin />}>
           <Route element={<Shell />}>
@@ -90,7 +99,7 @@ export default function App() {
             <Route path="/admin/articles/:articleId" element={<AdminArticleEditor />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<AppFallback />} />
       </Routes>
     </QueryClientProvider>
   )
