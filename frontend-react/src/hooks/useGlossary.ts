@@ -29,8 +29,11 @@ export function findGlossaryTerms(text: string, glossary: GlossaryTerm[]): Map<s
   for (const { term, definition } of sortedTerms) {
     const lowerTerm = term.toLowerCase()
     if (lowerText.includes(lowerTerm)) {
-      // Check word boundaries to avoid partial matches
-      const regex = new RegExp(`\\b${escapeRegExp(lowerTerm)}\\b`, 'gi')
+      // Use a more flexible boundary check that works with multi-word terms
+      // and handles punctuation
+      const escaped = escapeRegExp(lowerTerm)
+      // Match at word boundaries OR start/end of string OR next to punctuation
+      const regex = new RegExp(`(^|[^a-zA-Z0-9_])${escaped}(?=[^a-zA-Z0-9_]|$)`, 'gi')
       if (regex.test(text)) {
         found.set(term, definition)
       }

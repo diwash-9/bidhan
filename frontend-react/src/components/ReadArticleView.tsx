@@ -100,7 +100,7 @@ export default function ReadArticleView() {
   const wasFinished = useRef(false)
 
   // New feature hooks
-  const { isFocusMode, isSkimMode, toggleFocusMode, toggleSkimMode } = useFocusMode()
+  const { isFocusMode, isSkimMode, currentClauseIndex, setCurrentClauseIndex, toggleFocusMode, toggleSkimMode } = useFocusMode()
   const glossary = useGlossary()
   const { shareCard } = useShareCard()
   const articleGlossaryTerms = useMemo(() => {
@@ -458,6 +458,19 @@ export default function ReadArticleView() {
         {total === 0 && <p className="text-sm text-slate-500">No clause text is available for this article yet.</p>}
         {article.clauses.map((clause, clauseIndex) => {
           const isRead = readClauses.includes(clause.id)
+
+          // Focus mode: only show the current clause
+          if (isFocusMode && clauseIndex !== currentClauseIndex) return null
+
+          // Skim mode: get first sentence only
+          const getFirstSentence = (text: string) => {
+            const match = text.match(/^[^.!?]*[.!?]/)
+            return match ? match[0] : text
+          }
+          const isSkimmed = isSkimMode && !isFocusMode
+          const displayContent = isSkimmed ? getFirstSentence(clause.content) : clause.content
+          const showExpand = isSkimmed && clause.content.length > displayContent.length
+
           return (
             <section
               key={clause.id}
@@ -491,7 +504,15 @@ export default function ReadArticleView() {
                     <Link2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <GlossaryText text={clause.content} terms={articleGlossaryTerms} className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`} />
+                <GlossaryText text={displayContent} terms={articleGlossaryTerms} className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`} />
+                {showExpand && (
+                  <button
+                    onClick={() => setCurrentClauseIndex(clauseIndex)}
+                    className="mt-2 text-xs text-royal-400 hover:text-white underline"
+                  >
+                    Read more…
+                  </button>
+                )}
                 {clause.sub_clauses.length > 0 && (
                   <div className="mt-3 space-y-2 border-l border-slate-700 pl-3 sm:pl-4">
                     {clause.sub_clauses.map((sub) => (
