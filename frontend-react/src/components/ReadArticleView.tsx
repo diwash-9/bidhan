@@ -29,6 +29,7 @@ import {
   toggleReadClause,
   toggleSavedArticle,
 } from '@/lib/readProgress'
+import { useAuthStore } from '@/store/auth'
 import type { ReaderFont } from '@/lib/readProgress'
 
 const FONT_SIZES: Record<ReaderFont, { clause: string; sub: string }> = {
@@ -46,6 +47,8 @@ const RELATION_LABELS: Record<string, string> = {
 export default function ReadArticleView() {
   const { articleId = '' } = useParams()
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const homeTo = user ? '/' : '/'
   const { data: articleData, isLoading, isError } = useArticle(articleId)
   const { data: articles = [] } = useAllArticles()
 
@@ -276,6 +279,13 @@ export default function ReadArticleView() {
         </div>
       )}
 
+      <Link
+        to={homeTo}
+        className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 transition hover:text-white"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        {user ? 'Back to Path' : 'Back to home'}
+      </Link>
       <header className="mb-6">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-royal-300">
           <BookOpen className="w-4 h-4" /> Part {article.part_number} · {article.part_title}

@@ -6,6 +6,7 @@ import AuthPage from '@/components/AuthPage'
 import AdminArticleEditor from '@/components/AdminArticleEditor'
 import AdminView from '@/components/AdminView'
 import Header from '@/components/Header'
+import HomePage from '@/components/HomePage'
 import LeaderboardView from '@/components/LeaderboardView'
 import LessonView from '@/components/LessonView'
 import PathView from '@/components/PathView'
@@ -64,10 +65,16 @@ function AuthGate() {
   return <AuthPage />
 }
 
+function HomeGate() {
+  const { user, loading } = useAuthStore()
+  if (loading) return <div className="min-h-screen bg-slate-950" />
+  return user ? <PathView /> : <HomePage />
+}
+
 function AppFallback() {
   const { user, loading } = useAuthStore()
   if (loading) return <div className="min-h-screen bg-slate-950" />
-  return <Navigate to={user ? '/' : '/read'} replace />
+  return <Navigate to={user ? '/' : '/'} replace />
 }
 
 export default function App() {
@@ -79,26 +86,36 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
+        {/* Public home — shows HomePage for guests, PathView for signed-in users */}
+        <Route element={<Shell />}>
+          <Route path="/" element={<HomeGate />} />
+        </Route>
+
+        {/* Auth pages */}
         <Route path="/auth" element={<AuthGate />} />
+
+        {/* Protected game routes */}
         <Route element={<RequireAuth />}>
           <Route element={<Shell />}>
-            <Route path="/" element={<PathView />} />
             <Route path="/lesson/:articleId" element={<LessonView />} />
             <Route path="/leaderboard" element={<LeaderboardView />} />
             <Route path="/profile" element={<ProfileView />} />
           </Route>
         </Route>
+
         {/* Study mode is public: anyone can read the Constitution as a guest. */}
         <Route element={<Shell />}>
           <Route path="/read" element={<ReadView />} />
           <Route path="/read/:articleId" element={<ReadArticleView />} />
         </Route>
+
         <Route element={<RequireAdmin />}>
           <Route element={<Shell />}>
             <Route path="/admin" element={<AdminView />} />
             <Route path="/admin/articles/:articleId" element={<AdminArticleEditor />} />
           </Route>
         </Route>
+
         <Route path="*" element={<AppFallback />} />
       </Routes>
     </QueryClientProvider>

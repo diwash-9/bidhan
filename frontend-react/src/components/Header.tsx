@@ -54,7 +54,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b-2 border-royal-950 bg-gradient-to-r from-crimson-950/60 via-slate-950 to-royal-950/60 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center gap-2 sm:gap-4">
-      <Link to={isGuest ? '/auth' : '/'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
+      <Link to="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
         <Logo />
         <div className="min-w-0">
           <h1 className="font-display font-black text-lg sm:text-xl leading-none group-hover:opacity-90 transition truncate">

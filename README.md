@@ -66,10 +66,17 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
   article loads, part-scoped progress fetching, and a sub-KB progress-summary endpoint keep
   first login and every lesson load snappy even on high-latency databases.
 
-## Read the Constitution without an account
+## Public home page — two ways in
 
-`/read` and `/read/:articleId` are public. The landing page leads with **Start reading
-free**, and the header shows a Study tab plus a Sign in link for guests.
+The landing page at `/` presents two clear paths:
+
+| Path | What you get | Account required |
+|------|--------------|------------------|
+| **Start reading free** → `/read` | All 308 articles, search, read-aloud, clause tick-offs, bookmarks, progress saved locally | No |
+| **Sign in to play** → `/auth` | Branching learning path, lessons with quizzes, streaks, XP, hearts, leaderboard, practice mode | Yes |
+
+The old auth page is now a clean login/register screen at `/auth`. The logo and navigation
+consistently point to `/` for both guests and signed-in users.
 
 - **Library** — search by article number, title, or part; filter by part; focus the list on
   All / Saved / Finished articles with live counts. **Surprise me** opens a random one, and
