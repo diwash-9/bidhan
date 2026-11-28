@@ -17,12 +17,10 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import Confetti from '@/components/Confetti'
-import ProgressRing from '@/components/ProgressRing'
 import ReadingStreakBadge from '@/components/ReadingStreak'
 import { useShareCard } from '@/components/ShareCardGenerator'
 import TermTooltip from '@/components/TermTooltip'
 import { useAllArticles, useArticle } from '@/hooks/useApi'
-import { useFocusMode } from '@/hooks/useFocusMode'
 import { useGlossary, findGlossaryTerms } from '@/hooks/useGlossary'
 import { useReadAloud } from '@/hooks/useReadAloud'
 import {
@@ -100,7 +98,6 @@ export default function ReadArticleView() {
   const wasFinished = useRef(false)
 
   // New feature hooks
-  const { isFocusMode, isSkimMode, currentClauseIndex, setCurrentClauseIndex, toggleFocusMode, toggleSkimMode } = useFocusMode()
   const glossary = useGlossary()
   const { shareCard } = useShareCard()
   const articleGlossaryTerms = useMemo(() => {
@@ -259,36 +256,7 @@ export default function ReadArticleView() {
           <ArrowLeft className="w-4 h-4" /> Study library
         </Link>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <ProgressRing
-            readCount={readCount}
-            total={total}
-            size={48}
-            strokeWidth={5}
-            onClick={() => {}}
-          />
           <ReadingStreakBadge compact />
-          <button
-            onClick={toggleFocusMode}
-            aria-pressed={isFocusMode}
-            title={isFocusMode ? 'Exit focus mode' : 'Enter focus mode (one clause at a time)'}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              isFocusMode ? 'border-crimson-500 bg-crimson-500/10 text-crimson-300' : 'border-slate-800 bg-slate-950 text-slate-300 hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="hidden sm:inline">{isFocusMode ? 'Exit focus' : 'Focus'}</span>
-          </button>
-          <button
-            onClick={toggleSkimMode}
-            aria-pressed={isSkimMode}
-            title={isSkimMode ? 'Exit skim mode' : 'Skim mode (first sentence only)'}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              isSkimMode ? 'border-royal-500 bg-royal-500/10 text-royal-300' : 'border-slate-800 bg-slate-950 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Type className="w-4 h-4" />
-            <span className="hidden sm:inline">{isSkimMode ? 'Exit skim' : 'Skim'}</span>
-          </button>
           <button
             onClick={toggleSpeech}
             aria-pressed={speaking}
@@ -459,18 +427,6 @@ export default function ReadArticleView() {
         {article.clauses.map((clause, clauseIndex) => {
           const isRead = readClauses.includes(clause.id)
 
-          // Focus mode: only show the current clause
-          if (isFocusMode && clauseIndex !== currentClauseIndex) return null
-
-          // Skim mode: get first sentence only
-          const getFirstSentence = (text: string) => {
-            const match = text.match(/^[^.!?]*[.!?]/)
-            return match ? match[0] : text
-          }
-          const isSkimmed = isSkimMode && !isFocusMode
-          const displayContent = isSkimmed ? getFirstSentence(clause.content) : clause.content
-          const showExpand = isSkimmed && clause.content.length > displayContent.length
-
           return (
             <section
               key={clause.id}
@@ -504,15 +460,7 @@ export default function ReadArticleView() {
                     <Link2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <GlossaryText text={displayContent} terms={articleGlossaryTerms} className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`} />
-                {showExpand && (
-                  <button
-                    onClick={() => setCurrentClauseIndex(clauseIndex)}
-                    className="mt-2 text-xs text-royal-400 hover:text-white underline"
-                  >
-                    Read more…
-                  </button>
-                )}
+                <GlossaryText text={clause.content} terms={articleGlossaryTerms} className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`} />
                 {clause.sub_clauses.length > 0 && (
                   <div className="mt-3 space-y-2 border-l border-slate-700 pl-3 sm:pl-4">
                     {clause.sub_clauses.map((sub) => (
