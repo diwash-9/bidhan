@@ -11,6 +11,8 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Guest access**: `/read` and `/read/:articleId` are public. Guests get a Study-only header with a Sign in link, and the auth screen links directly to reading. Game routes stay login-gated and unchanged.
 - **Interactive reader**: per-clause check-offs with a progress bar and jump-to-clause chips, read-aloud (browser voice with online fallback), three text sizes, bookmarks, copyable article/clause links, related-article links, and ←/→ keyboard paging.
 - **Library extras**: Continue reading, Saved for later, a "Surprise me" random article button, and local finished/bookmarked counts.
+- **Library focus filters**: All / Saved / Finished tabs with live counts, status badges on cards, and a Finished articles shelf.
+- **Reader details**: estimated reading time in the header and a two-step "Reset progress" control that clears only this article's local clause ticks and finished marker.
 
 ### Changed
 - **Auth landing page**: two clear paths instead of a small reading link — a prominent "Start reading free" card (every article unlocked, read aloud, bookmarks) and a tabbed Log in / Create account card, plus a "Continue without an account" option and a compact benefits strip. Reading is the first path on mobile too.

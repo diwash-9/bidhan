@@ -71,12 +71,13 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 `/read` and `/read/:articleId` are public. The landing page leads with **Start reading
 free**, and the header shows a Study tab plus a Sign in link for guests.
 
-- **Library** — search by article number, title, or part; filter by part; open any of the
-  308 articles. **Surprise me** opens a random one, and Continue reading / Saved for later
-  use your device-local history.
+- **Library** — search by article number, title, or part; filter by part; focus the list on
+  All / Saved / Finished articles with live counts. **Surprise me** opens a random one, and
+  Continue reading / Saved for later / Finished articles use your device-local history.
 - **Reader** — tick clauses off as you go, watch the progress bar, jump to a clause, resize
   text, bookmark the article, copy deep links to it or a clause, follow related-article
-  links, and flip between articles with ← / →.
+  links, flip between articles with ← / →, see an estimated reading time, and reset this
+  article's local progress with a two-step confirmation.
 - **Read aloud** — prefers a voice installed on the device. If the browser has no working
   voices or blocks playback, it falls back to an online voice; a **Try online voice** button
   retries from a fresh click. The online voice sends the article text to Google Translate's

@@ -8,6 +8,7 @@ import {
   Link2,
   Pause,
   Play,
+  RotateCcw,
   Sparkles,
   Star,
   Type,
@@ -22,6 +23,7 @@ import {
   getReaderFont,
   getSavedArticles,
   markArticleFinished,
+  resetArticleProgress,
   setLastArticle,
   setReaderFont,
   toggleReadClause,
@@ -59,6 +61,7 @@ export default function ReadArticleView() {
   const [font, setFont] = useState<ReaderFont>(() => getReaderFont())
   const [copied, setCopied] = useState(false)
   const [celebrate, setCelebrate] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
   const wasFinished = useRef(false)
 
   const total = article?.clauses.length ?? 0
@@ -68,6 +71,21 @@ export default function ReadArticleView() {
   )
   const finished = total > 0 && readCount === total
   const isSaved = savedArticles.includes(articleId)
+
+  const words = useMemo(
+    () =>
+      article
+        ? article.clauses.reduce(
+            (sum, clause) =>
+              sum +
+              clause.content.split(/\s+/).length +
+              clause.sub_clauses.reduce((subSum, sub) => subSum + sub.content.split(/\s+/).length, 0),
+            0,
+          )
+        : 0,
+    [article],
+  )
+  const minutes = Math.max(1, Math.ceil(words / 220))
 
   const speechLines = useMemo(
     () =>
@@ -105,6 +123,12 @@ export default function ReadArticleView() {
     const timer = window.setTimeout(() => setCopied(false), 1800)
     return () => window.clearTimeout(timer)
   }, [copied])
+
+  useEffect(() => {
+    if (!confirmReset) return
+    const timer = window.setTimeout(() => setConfirmReset(false), 3000)
+    return () => window.clearTimeout(timer)
+  }, [confirmReset])
 
   useEffect(() => {
     if (finished && article) markArticleFinished(article.id)
@@ -155,6 +179,13 @@ export default function ReadArticleView() {
   const changeFont = (next: ReaderFont) => {
     setFont(next)
     setReaderFont(next)
+  }
+
+  const resetProgress = () => {
+    resetArticleProgress(articleId)
+    setReadClauses([])
+    setConfirmReset(false)
+    setCelebrate(false)
   }
 
   if (isLoading) {
@@ -250,16 +281,33 @@ export default function ReadArticleView() {
           <BookOpen className="w-4 h-4" /> Part {article.part_number} · {article.part_title}
         </p>
         <h1 className="text-2xl sm:text-3xl font-display font-bold mt-3">{article.title}</h1>
-        <p className="text-xs text-slate-500 mt-2">
-          Article {article.article_number} <span className="mx-2 text-slate-700">·</span> {article.id}
+        <p className="mt-2 text-xs text-slate-500">
+          Article {article.article_number} <span className="mx-2 text-slate-700">·</span> {article.id}{' '}
+          <span className="mx-2 text-slate-700">·</span> ≈ {minutes} min read
         </p>
       </header>
 
       {total > 0 && (
         <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-          <div className="flex justify-between text-xs font-semibold text-slate-400 mb-2">
+          <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold text-slate-400">
             <span>Your reading progress</span>
-            <span>{readCount}/{total} clauses</span>
+            <div className="flex items-center gap-3">
+              <span>{readCount}/{total} clauses</span>
+              {readCount > 0 && (
+                <button
+                  type="button"
+                  onClick={confirmReset ? resetProgress : () => setConfirmReset(true)}
+                  className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition ${
+                    confirmReset
+                      ? 'bg-crimson-600 text-white hover:bg-crimson-500'
+                      : 'border border-slate-800 text-slate-400 hover:border-crimson-700 hover:text-crimson-300'
+                  }`}
+                >
+                  <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                  {confirmReset ? 'Confirm reset' : 'Reset'}
+                </button>
+              )}
+            </div>
           </div>
           <div
             className="h-2 overflow-hidden rounded-full bg-slate-800"

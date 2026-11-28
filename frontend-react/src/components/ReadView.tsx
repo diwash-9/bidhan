@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bookmark, Clock3, Search, Shuffle, Sparkles } from 'lucide-react'
+import { ArrowRight, BookOpen, Bookmark, CheckCircle2, Clock3, Search, Shuffle, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useAllArticles } from '@/hooks/useApi'
@@ -11,11 +11,13 @@ export default function ReadView() {
   const { data: articles = [], isLoading, isError } = useAllArticles()
   const [query, setQuery] = useState('')
   const [partNumber, setPartNumber] = useState<number | 'all'>('all')
+  const [scope, setScope] = useState<'all' | 'saved' | 'finished'>('all')
 
   const savedIds = useMemo(() => getSavedArticles(), [])
   const finishedIds = useMemo(() => getFinishedArticles(), [])
   const lastId = useMemo(() => getLastArticle(), [])
   const savedArticles = useMemo(() => articles.filter((article) => savedIds.includes(article.id)), [articles, savedIds])
+  const finishedArticles = useMemo(() => articles.filter((article) => finishedIds.includes(article.id)), [articles, finishedIds])
   const lastArticle = useMemo(() => articles.find((article) => article.id === lastId), [articles, lastId])
 
   const parts = useMemo(() => {
@@ -28,6 +30,8 @@ export default function ReadView() {
     const term = query.trim().toLowerCase()
     const filtered = articles.filter((article) => {
       if (partNumber !== 'all' && article.part_number !== partNumber) return false
+      if (scope === 'saved' && !savedIds.includes(article.id)) return false
+      if (scope === 'finished' && !finishedIds.includes(article.id)) return false
       if (!term) return true
       return (
         article.id.toLowerCase().includes(term) ||
@@ -45,7 +49,7 @@ export default function ReadView() {
       byPart.set(article.part_number, group)
     }
     return [...byPart.entries()].sort(([a], [b]) => a - b)
-  }, [articles, query, partNumber])
+  }, [articles, query, partNumber, scope, savedIds, finishedIds])
 
   const shown = groups.reduce((total, [, group]) => total + group.items.length, 0)
 
@@ -61,7 +65,19 @@ export default function ReadView() {
       className="group flex items-start justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 transition hover:border-royal-700 hover:bg-slate-800/60"
     >
       <div className="min-w-0">
-        <p className="text-xs font-bold text-crimson-400">{label}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-xs font-bold text-crimson-400">{label}</p>
+          {finishedIds.includes(article.id) && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700/50 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+              <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Finished
+            </span>
+          )}
+          {savedIds.includes(article.id) && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-yellow-700/50 bg-yellow-500/10 px-2 py-0.5 text-[10px] font-bold text-yellow-300">
+              <Bookmark className="h-3 w-3 fill-yellow-400" aria-hidden="true" /> Saved
+            </span>
+          )}
+        </div>
         <p className="mt-0.5 line-clamp-2 text-sm font-semibold text-slate-200 group-hover:text-white">{article.title}</p>
       </div>
       <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-600 transition group-hover:text-royal-300" aria-hidden="true" />
@@ -113,6 +129,27 @@ export default function ReadView() {
             <Shuffle className="h-4 w-4" /> Surprise me
           </button>
         </div>
+        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter library">
+          {([
+            ['all', 'All articles', articles.length],
+            ['saved', 'Saved', savedIds.length],
+            ['finished', 'Finished', finishedIds.length],
+          ] as const).map(([value, label, count]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setScope(value)}
+              aria-pressed={scope === value}
+              className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                scope === value
+                  ? 'border-royal-600 bg-royal-700/30 text-white'
+                  : 'border-slate-800 text-slate-400 hover:border-royal-700 hover:text-white'
+              }`}
+            >
+              {label} <span className="ml-1 text-[10px] opacity-70">{count}</span>
+            </button>
+          ))}
+        </div>
         <p className="mt-3 text-xs text-slate-500" aria-live="polite">
           {isLoading ? 'Loading library…' : `${shown} of ${articles.length} articles shown`}
           {!isLoading && (finishedIds.length > 0 || savedIds.length > 0) && (
@@ -129,24 +166,39 @@ export default function ReadView() {
         </div>
       )}
 
-      {lastArticle && (
-        <section aria-labelledby="continue-heading">
-          <h2 id="continue-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
-            <Clock3 className="h-4 w-4 text-royal-300" /> Continue reading
-          </h2>
-          {articleCard(lastArticle, `Article ${lastArticle.article_number} · Part ${lastArticle.part_number}`)}
-        </section>
-      )}
+      {scope === 'all' && (
+        <>
+          {lastArticle && (
+            <section aria-labelledby="continue-heading">
+              <h2 id="continue-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
+                <Clock3 className="h-4 w-4 text-royal-300" /> Continue reading
+              </h2>
+              {articleCard(lastArticle, `Article ${lastArticle.article_number} · Part ${lastArticle.part_number}`)}
+            </section>
+          )}
 
-      {savedArticles.length > 0 && (
-        <section aria-labelledby="saved-heading">
-          <h2 id="saved-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
-            <Bookmark className="h-4 w-4 text-yellow-400" /> Saved for later
-          </h2>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {savedArticles.map((article) => articleCard(article, `Article ${article.article_number}`))}
-          </div>
-        </section>
+          {savedArticles.length > 0 && (
+            <section aria-labelledby="saved-heading">
+              <h2 id="saved-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
+                <Bookmark className="h-4 w-4 text-yellow-400" /> Saved for later
+              </h2>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {savedArticles.map((article) => articleCard(article, `Article ${article.article_number}`))}
+              </div>
+            </section>
+          )}
+
+          {finishedArticles.length > 0 && (
+            <section aria-labelledby="finished-heading">
+              <h2 id="finished-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Finished articles
+              </h2>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {finishedArticles.map((article) => articleCard(article, `Article ${article.article_number}`))}
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       {groups.map(([number, group]) => (
@@ -165,7 +217,11 @@ export default function ReadView() {
 
       {!isLoading && !isError && shown === 0 && (
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-10 text-center text-slate-400">
-          No articles match that search. Try another title or article number.
+          {scope === 'saved'
+            ? 'No saved articles yet. Bookmark one from the reader to find it here.'
+            : scope === 'finished'
+              ? 'No finished articles yet. Tick every clause in an article to complete it.'
+              : 'No articles match that search. Try another title or article number.'}
         </div>
       )}
 

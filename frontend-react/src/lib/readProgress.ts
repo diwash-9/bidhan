@@ -81,6 +81,16 @@ export function markArticleFinished(articleId: string): void {
   if (!current.includes(articleId)) writeJson(COMPLETED_KEY, [articleId, ...current])
 }
 
+export function resetArticleProgress(articleId: string): void {
+  const clauses = readJson<Record<string, number[]>>(CLAUSES_KEY, {})
+  delete clauses[articleId]
+  writeJson(CLAUSES_KEY, clauses)
+  const finished = getFinishedArticles()
+  if (finished.includes(articleId)) {
+    writeJson(COMPLETED_KEY, finished.filter((id) => id !== articleId))
+  }
+}
+
 export function getLastArticle(): string | null {
   return readString(LAST_KEY)
 }
