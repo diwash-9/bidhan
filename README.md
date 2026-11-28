@@ -55,7 +55,7 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 - **Gamification** :  XP (+5/answer, +15/lesson, +4/practice), streaks, leagues, sound, and
   celebrations.
 - **Practice mode** :  replay any completed lesson for reduced XP with zero heart cost.
-- **Study mode (no sign-in needed)** :  browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP :  game progress is untouched.
+- **Study mode (no sign-in needed)** :  browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, copy deep links, **see legal-term definitions on hover**, **track your local reading streak**, **share clause cards**, and **resume where you left off**. No unlocks, quizzes, hearts, or XP :  game progress is untouched.
 - **Weekly quest & leaderboard** :  a 100 XP weekly goal with a live progress bar, plus
   weekly-first and all-time rankings.
 - **User accounts** :  secure signup/login with JWT access + refresh tokens and per-user progress; the landing page leads with a prominent no-sign-in reading option for visitors who just want to explore.
@@ -80,18 +80,26 @@ consistently point to `/` for both guests and signed-in users.
 
 - **Library** :  search by article number, title, or part; filter by part; focus the list on
   All / Saved / Finished articles with live counts. **Surprise me** opens a random one, and
-  Continue reading / Saved for later / Finished articles use your device-local history.
+  **Smart resume** shows your last-read article with the next clause. Continue reading /
+  Saved for later / Finished articles use your device-local history.
 - **Reader** :  tick clauses off as you go, watch the progress bar, jump to a clause, resize
   text, bookmark the article, copy deep links to it or a clause, follow related-article
   links, flip between articles with ← / →, see an estimated reading time, and reset this
   article's local progress with a two-step confirmation.
+- **Legal-term glossary** :  30+ constitutional terms (sovereignty, fundamental rights,
+  directive principles, federalism, secularism, etc.) are underlined with a dotted line;
+  hover or tap to see a plain-language definition. Works in both English and Nepali modes.
+- **Reading streak** :  local counter in the toolbar shows how many consecutive days you've
+  read at least one clause. No account, no server.
+- **Shareable clause cards** :  one tap generates a clean 1200×630 PNG image with the
+  article title and text, ready to share via Web Share API or download.
 - **Read aloud** :  prefers a voice installed on the device. If the browser has no working
   voices or blocks playback, it falls back to an online voice; a **Try online voice** button
   retries from a fresh click. The online voice sends the article text to Google Translate's
   public TTS endpoint, so it requires an internet connection.
-- **Local only** :  clause ticks, bookmarks, finished articles, text size, and the last-read
-  article live in this browser's `localStorage`. There is no account and no server-side
-  reading state.
+- **Local only** :  clause ticks, bookmarks, finished articles, text size, reading streak,
+  and the last-read article live in this browser's `localStorage`. There is no account and no
+  server-side reading state.
 - **No game impact** :  Study mode never calls quiz, completion, or heart APIs and never
   changes unlocks, XP, streaks, or hearts.
 

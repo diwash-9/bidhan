@@ -13,6 +13,10 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Library extras**: Continue reading, Saved for later, a "Surprise me" random article button, and local finished/bookmarked counts.
 - **Library focus filters**: All / Saved / Finished tabs with live counts, status badges on cards, and a Finished articles shelf.
 - **Reader details**: estimated reading time in the header and a two-step "Reset progress" control that clears only this article's local clause ticks and finished marker.
+- **Legal-term glossary**: 30+ constitutional terms (sovereignty, fundamental rights, directive principles, federalism, secularism, etc.) underlined with a dotted line; hover/tap for plain-language definitions.
+- **Reading streak**: local consecutive-day counter in the reader toolbar (appears after first clause read).
+- **Smart resume**: library shows "Continue Article X, clause Y" card after reading.
+- **Shareable clause cards**: one-tap 1200×630 PNG generation via Web Share API / download fallback.
 
 ### Changed
 - **Auth landing page**: two clear paths instead of a small reading link :  a prominent "Start reading free" card (every article unlocked, read aloud, bookmarks) and a tabbed Log in / Create account card, plus a "Continue without an account" option and a compact benefits strip. Reading is the first path on mobile too.
@@ -25,10 +29,10 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Public home page**: new landing page at `/` with two clear entry points :  "Start reading free" (Study mode, no account) and "Sign in to play" (Guided path with lessons, quizzes, streaks). The old auth page is now a clean login/register screen at `/auth`. Logo and navigation consistently point to `/` for both guests and signed-in users.
 
 ### Notes
-- Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.
+- Clause progress, bookmarks, reading streak, finished articles, text size, and the last-read article live in `localStorage`. No backend, database, or game-progress changes.
 
 ### Docs
-- README now documents public Study routes, device-local reading state, read-aloud behavior (including the third-party online voice), and which API endpoints are public vs authenticated. SECURITY notes the `localStorage` and third-party TTS implications.
+- README documents public Study routes, device-local reading state, read-aloud behavior (including the third-party online voice), glossary, streak, share cards, and which API endpoints are public vs authenticated. SECURITY notes the `localStorage` and third-party TTS implications.
 
 ### Verified
 - Frontend `typecheck`, `lint`, `build` clean.
