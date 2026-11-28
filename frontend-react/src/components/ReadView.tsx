@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bookmark, CheckCircle2, Clock3, Search, Shuffle, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Bookmark, CheckCircle2, Clock3, Search, Shuffle, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useAllArticles } from '@/hooks/useApi'
 import { getFinishedArticles, getLastArticle, getSavedArticles } from '@/lib/readProgress'
+import { useAuthStore } from '@/store/auth'
 import type { CatalogArticle } from '@/types'
 
 export default function ReadView() {
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const homeTo = user ? '/' : '/auth'
   const { data: articles = [], isLoading, isError } = useAllArticles()
   const [query, setQuery] = useState('')
   const [partNumber, setPartNumber] = useState<number | 'all'>('all')
@@ -87,6 +90,13 @@ export default function ReadView() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <section className="rounded-3xl border border-slate-800 bg-slate-900 p-5 shadow-2xl sm:p-7">
+        <Link
+          to={homeTo}
+          className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 transition hover:text-white"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+          {user ? 'Back to Path' : 'Back to home'}
+        </Link>
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-royal-300">
           <BookOpen className="h-4 w-4" /> Study mode
         </p>

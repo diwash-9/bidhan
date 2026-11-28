@@ -21,6 +21,7 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Read-aloud reliability**: pick an available English voice, defer speaking after `cancel()` to avoid Chrome dropping queued utterances, and show a clear message when audio is blocked or the browser has no speech voices.
 - **Read-aloud fallback**: if the browser engine reports `synthesis-failed` or never starts (common on Linux/Chromium without installed voices), playback automatically retries with an online spoken-audio voice; the toolbar shows whether the device or online voice is in use.
 - **Audio autoplay block**: media playback is primed inside the Listen click, the online voice is used directly when no browser voices exist, and a "Try online voice" button retries from a fresh click if a browser still blocks audio. Verified in Chromium with its default user-gesture autoplay policy.
+- **Study navigation**: the logo no longer loops back to the library for guests — it leads to the public landing page. Study mode now also has an explicit Home link in the header (desktop and mobile) and a back link on the library page.
 
 ### Notes
 - Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.
