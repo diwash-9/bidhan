@@ -48,12 +48,12 @@ function RequireAdmin() {
   return <Outlet />
 }
 
-function Shell() {
+function Shell({ children }: { children?: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       <Header />
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 py-6 max-w-7xl">
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
     </div>
   )
@@ -68,7 +68,16 @@ function AuthGate() {
 function HomeGate() {
   const { user, loading } = useAuthStore()
   if (loading) return <div className="min-h-screen bg-slate-950" />
-  return user ? <PathView /> : <HomePage />
+  if (user) {
+    // Authenticated users get the app shell with Header
+    return (
+      <Shell>
+        <PathView />
+      </Shell>
+    )
+  }
+  // Guests get the standalone landing page (no global Header)
+  return <HomePage />
 }
 
 function AppFallback() {
@@ -86,10 +95,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        {/* Public home — shows HomePage for guests, PathView for signed-in users */}
-        <Route element={<Shell />}>
-          <Route path="/" element={<HomeGate />} />
-        </Route>
+        {/* Public home — standalone page (no global Header) for guests; PathView for signed-in users */}
+        <Route path="/" element={<HomeGate />} />
 
         {/* Auth pages */}
         <Route path="/auth" element={<AuthGate />} />
