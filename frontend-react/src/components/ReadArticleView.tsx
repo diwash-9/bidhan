@@ -53,7 +53,8 @@ function GlossaryText({ text, terms, className = '' }: { text: string; terms: Ma
   if (terms.size === 0) return <span className={className}>{text}</span>
 
   const sortedTerms = [...terms.entries()].sort((a, b) => b[0].length - a[0].length)
-  const regex = new RegExp(`\\b(${sortedTerms.map(([term]) => escapeRegExp(term)).join('|')})\\b`, 'gi')
+  // Capture the term so split includes it in the result
+  const regex = new RegExp(`(^|[^a-zA-Z0-9_])(${sortedTerms.map(([term]) => escapeRegExp(term)).join('|')})(?=[^a-zA-Z0-9_]|$)`, 'gi')
   const parts = text.split(regex)
 
   return (
