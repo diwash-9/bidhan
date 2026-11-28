@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Bookmark, CheckCircle2, Clock3, Search, Shuffle, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import SmartResume from '@/components/SmartResume'
 import { useAllArticles } from '@/hooks/useApi'
 import { getFinishedArticles, getLastArticle, getSavedArticles } from '@/lib/readProgress'
 import { useAuthStore } from '@/store/auth'
@@ -178,6 +179,7 @@ export default function ReadView() {
 
       {scope === 'all' && (
         <>
+          <SmartResume />
           {lastArticle && (
             <section aria-labelledby="continue-heading">
               <h2 id="continue-heading" className="mb-3 flex items-center gap-2 font-display text-lg font-bold">

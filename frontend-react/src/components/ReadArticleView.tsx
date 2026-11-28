@@ -9,6 +9,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Share2,
   Sparkles,
   Star,
   Type,
@@ -16,7 +17,13 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import Confetti from '@/components/Confetti'
+import ProgressRing from '@/components/ProgressRing'
+import ReadingStreakBadge from '@/components/ReadingStreak'
+import { useShareCard } from '@/components/ShareCardGenerator'
+import TermTooltip from '@/components/TermTooltip'
 import { useAllArticles, useArticle } from '@/hooks/useApi'
+import { useFocusMode } from '@/hooks/useFocusMode'
+import { useGlossary, findGlossaryTerms } from '@/hooks/useGlossary'
 import { useReadAloud } from '@/hooks/useReadAloud'
 import {
   getReadClauses,
@@ -44,6 +51,31 @@ const RELATION_LABELS: Record<string, string> = {
   text_reference: 'Referenced here',
 }
 
+function GlossaryText({ text, terms, className = '' }: { text: string; terms: Map<string, string>; className?: string }) {
+  if (terms.size === 0) return <span className={className}>{text}</span>
+
+  const sortedTerms = [...terms.entries()].sort((a, b) => b[0].length - a[0].length)
+  const regex = new RegExp(`\\b(${sortedTerms.map(([term]) => escapeRegExp(term)).join('|')})\\b`, 'gi')
+  const parts = text.split(regex)
+
+  return (
+    <span className={className}>
+      {parts.map((part, _i) => {
+        const matched = sortedTerms.find(([term]) => term.toLowerCase() === part.toLowerCase())
+        if (matched) {
+          const [term, definition] = matched
+          return <TermTooltip key={term} term={term} definition={definition}>{part}</TermTooltip>
+        }
+        return part
+      })}
+    </span>
+  )
+}
+
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export default function ReadArticleView() {
   const { articleId = '' } = useParams()
   const navigate = useNavigate()
@@ -66,6 +98,19 @@ export default function ReadArticleView() {
   const [celebrate, setCelebrate] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const wasFinished = useRef(false)
+
+  // New feature hooks
+  const { isFocusMode, isSkimMode, toggleFocusMode, toggleSkimMode } = useFocusMode()
+  const glossary = useGlossary()
+  const { shareCard } = useShareCard()
+  const articleGlossaryTerms = useMemo(() => {
+    if (!article || glossary.length === 0) return new Map<string, string>()
+    const fullText = [
+      article.title,
+      ...article.clauses.flatMap(c => [c.content, ...c.sub_clauses.map(s => s.content)])
+    ].join(' ')
+    return findGlossaryTerms(fullText, glossary)
+  }, [article, glossary])
 
   const total = article?.clauses.length ?? 0
   const readCount = useMemo(
@@ -209,11 +254,41 @@ export default function ReadArticleView() {
 
   return (
     <div className="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl">
-      <div className="flex flex-wrap items-center gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <Link to="/read" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm font-semibold transition">
           <ArrowLeft className="w-4 h-4" /> Study library
         </Link>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <ProgressRing
+            readCount={readCount}
+            total={total}
+            size={48}
+            strokeWidth={5}
+            onClick={() => {}}
+          />
+          <ReadingStreakBadge compact />
+          <button
+            onClick={toggleFocusMode}
+            aria-pressed={isFocusMode}
+            title={isFocusMode ? 'Exit focus mode' : 'Enter focus mode (one clause at a time)'}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              isFocusMode ? 'border-crimson-500 bg-crimson-500/10 text-crimson-300' : 'border-slate-800 bg-slate-950 text-slate-300 hover:text-white'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span className="hidden sm:inline">{isFocusMode ? 'Exit focus' : 'Focus'}</span>
+          </button>
+          <button
+            onClick={toggleSkimMode}
+            aria-pressed={isSkimMode}
+            title={isSkimMode ? 'Exit skim mode' : 'Skim mode (first sentence only)'}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              isSkimMode ? 'border-royal-500 bg-royal-500/10 text-royal-300' : 'border-slate-800 bg-slate-950 text-slate-300 hover:text-white'
+            }`}
+          >
+            <Type className="w-4 h-4" />
+            <span className="hidden sm:inline">{isSkimMode ? 'Exit skim' : 'Skim'}</span>
+          </button>
           <button
             onClick={toggleSpeech}
             aria-pressed={speaking}
@@ -262,6 +337,24 @@ export default function ReadArticleView() {
           >
             <Copy className="w-4 h-4" />
             <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy link'}</span>
+          </button>
+          <button
+            onClick={() => {
+              if (!article) return
+              const clauseText = article.clauses
+                .flatMap(c => [c.content, ...c.sub_clauses.map(s => s.content)])
+                .join('\n\n')
+              shareCard({
+                articleNumber: article.article_number,
+                articleTitle: article.title,
+                clauseText: clauseText.slice(0, 500)
+              })
+            }}
+            title="Share this article as an image"
+            className="flex items-center gap-1.5 rounded-full border border-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition"
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Share</span>
           </button>
         </div>
       </div>
@@ -398,13 +491,13 @@ export default function ReadArticleView() {
                     <Link2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <p className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`}>{clause.content}</p>
+                <GlossaryText text={clause.content} terms={articleGlossaryTerms} className={`break-words font-display text-slate-200 ${FONT_SIZES[font].clause}`} />
                 {clause.sub_clauses.length > 0 && (
                   <div className="mt-3 space-y-2 border-l border-slate-700 pl-3 sm:pl-4">
                     {clause.sub_clauses.map((sub) => (
                       <p key={sub.identifier} className={`break-words font-display text-slate-400 ${FONT_SIZES[font].sub}`}>
                         <span className="mr-2 font-sans font-bold text-royal-300">({sub.identifier})</span>
-                        {sub.content}
+                        <GlossaryText text={sub.content} terms={articleGlossaryTerms} />
                       </p>
                     ))}
                   </div>
