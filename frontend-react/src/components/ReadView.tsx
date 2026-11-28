@@ -102,7 +102,7 @@ export default function ReadView() {
         </p>
         <h1 className="mt-2 font-display text-2xl font-bold sm:text-3xl">Read the Constitution, your way</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
-          Every article is open here — no account, no unlocks, no quizzes, no hearts. Pick any article,
+          Every article is open here: no account, no unlocks, no quizzes, no hearts. Pick any article,
           tick off clauses as you read, listen along, and make it your own.
         </p>
 

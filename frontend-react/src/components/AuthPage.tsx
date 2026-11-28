@@ -105,7 +105,7 @@ export default function AuthPage() {
             <p className="mt-1 text-sm text-slate-400">
               {mode === 'login'
                 ? 'Pick up right where you left off.'
-                : 'Join in under a minute — it&apos;s free.'}
+                : 'Join in under a minute: it&apos;s free.'}
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function AuthPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
               Back to home
             </Link>
-            <p className="mt-2 text-xs text-slate-500">Or just <span className="font-semibold">start reading</span> — no account needed</p>
+            <p className="mt-2 text-xs text-slate-500">Or just <span className="font-semibold">start reading</span>: no account needed</p>
           </div>
         </section>
       </main>

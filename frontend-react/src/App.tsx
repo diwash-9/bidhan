@@ -95,7 +95,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        {/* Public home — standalone page (no global Header) for guests; PathView for signed-in users */}
+        {/* Public home: standalone page (no global Header) for guests; PathView for signed-in users */}
         <Route path="/" element={<HomeGate />} />
 
         {/* Auth pages */}

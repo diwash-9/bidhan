@@ -30,7 +30,7 @@ export default function HomePage() {
             Nepal&apos;s Constitution, <span className="text-crimson-400">readable</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base sm:text-lg leading-relaxed text-slate-400">
-            All 308 articles. Search, listen, bookmark — no account required.
+            All 308 articles. Search, listen, bookmark: no account required.
             Want structure? Sign in for guided lessons, quizzes, and progress tracking.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">✓</span>
-                    <span>Read aloud — browser voice with online fallback</span>
+                    <span>Read aloud: browser voice with online fallback</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">✓</span>
@@ -89,7 +89,7 @@ export default function HomePage() {
               </span>
               <div className="flex-1 min-w-0">
                 <h2 className="font-display text-xl font-bold">Guided Learning Path</h2>
-                <p className="mt-1 text-sm text-slate-400">Lessons, quizzes, streaks — make it stick</p>
+                <p className="mt-1 text-sm text-slate-400">Lessons, quizzes, streaks: make it stick</p>
 
                 <ul className="mt-5 space-y-2.5 text-sm text-slate-300" role="list">
                   <li className="flex items-center gap-2.5">
@@ -106,7 +106,7 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">✓</span>
-                    <span>Practice mode — replay any completed lesson</span>
+                    <span>Practice mode: replay any completed lesson</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">✓</span>
@@ -131,12 +131,12 @@ export default function HomePage() {
             <div className="p-4">
               <Shield className="mx-auto h-8 w-8 text-royal-400/80" aria-hidden="true" />
               <h3 className="mt-3 font-semibold text-sm">Official Text</h3>
-              <p className="mt-1 text-xs text-slate-500">Constitution of Nepal 2072 (2015) — all 308 articles</p>
+              <p className="mt-1 text-xs text-slate-500">Constitution of Nepal 2072 (2015): all 308 articles</p>
             </div>
             <div className="p-4">
               <Users className="mx-auto h-8 w-8 text-crimson-400/80" aria-hidden="true" />
               <h3 className="mt-3 font-semibold text-sm">Built for Nepalis</h3>
-              <p className="mt-1 text-xs text-slate-500">English now, Nepali coming — read in your language</p>
+              <p className="mt-1 text-xs text-slate-500">English now, Nepali coming: read in your language</p>
             </div>
             <div className="p-4">
               <Flame className="mx-auto h-8 w-8 text-orange-400/80 fill-orange-400/80" aria-hidden="true" />

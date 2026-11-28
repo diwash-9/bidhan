@@ -27,7 +27,7 @@ export default function LessonView() {
   const { data: article } = useArticle(articleId)
   const { data: quiz = [] } = useQuiz(articleId)
   // Lightweight summary (+ single-article status) instead of the 308-row
-  // full progress — LessonView no longer triggers a full refetch per visit.
+  // full progress: LessonView no longer triggers a full refetch per visit.
   const { data: progress, refetch: refetchProgress } = useProgressSummary(articleId)
 
   const [phase, setPhase] = useState<'read' | 'quiz'>(isPractice ? 'quiz' : 'read')
@@ -71,7 +71,7 @@ export default function LessonView() {
     async (letter: string) => {
       if (!current || answers[current.id]?.is_correct) return
       // Client-side hearts guard: at 0 hearts the server 403s every attempt,
-      // so don't send pointless requests — the empty-hearts panel takes over.
+      // so don't send pointless requests: the empty-hearts panel takes over.
       if (outOfHearts) {
         void refetchProgress()
         return
@@ -224,7 +224,7 @@ export default function LessonView() {
             <button
               onClick={handleStartQuiz}
               disabled={quiz.length === 0 || isPractice || outOfHearts}
-              title={outOfHearts ? "You're out of hearts — wait for a refill" : undefined}
+              title={outOfHearts ? "You're out of hearts: wait for a refill" : undefined}
               className={`w-full font-bold py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 ${
                 quiz.length === 0 || isPractice || outOfHearts
                   ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
@@ -380,7 +380,7 @@ export default function LessonView() {
                     ) : (
                       <span className="flex items-center gap-2">
                         <Heart className="w-4 h-4 shrink-0 fill-crimson-500 text-crimson-500" />
-                        {isPractice ? 'Not quite — keep trying!' : <><span className="font-bold">−1 heart.</span><span className="font-normal">{answered.explanation}</span></>}
+                        {isPractice ? 'Not quite: keep trying!' : <><span className="font-bold">−1 heart.</span><span className="font-normal">{answered.explanation}</span></>}
                       </span>
                     )}
                   </div>
@@ -404,7 +404,7 @@ export default function LessonView() {
           {finished && (
             <div className="p-4 rounded-xl bg-royal-500/10 border border-royal-500/30 text-royal-200 font-semibold text-center flex items-center justify-center gap-2">
               <CheckCircle className="w-5 h-5 shrink-0" />
-              {isPractice ? 'Practice session complete — great review!' : 'Quiz passed — you may finish the lesson.'}
+              {isPractice ? 'Practice session complete: great review!' : 'Quiz passed: you may finish the lesson.'}
             </div>
           )}
 
@@ -443,7 +443,7 @@ export default function LessonView() {
           <button
             onClick={handleComplete}
             disabled={!finished || outOfHearts || completeMutation.isPending}
-            title={outOfHearts ? "You're out of hearts — wait for a refill to finish" : undefined}
+            title={outOfHearts ? "You're out of hearts: wait for a refill to finish" : undefined}
             className={`w-full font-bold py-4 rounded-2xl transition shadow-lg ${
               finished && !outOfHearts
                 ? 'bg-crimson-600 hover:bg-crimson-500 text-white'

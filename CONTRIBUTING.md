@@ -5,18 +5,18 @@ approachable and is shaped by contributions from people like you.
 
 ## Ways to contribute
 
-- **Report a bug** — open an issue with a clear title, steps to reproduce, and expected vs.
+- **Report a bug** :  open an issue with a clear title, steps to reproduce, and expected vs.
   actual behavior.
-- **Propose a feature or improvement** — open an issue describing the problem you're trying
+- **Propose a feature or improvement** :  open an issue describing the problem you're trying
   to solve.
-- **Fix a bug or add a feature** — fork the repo, make a focused change, and open a pull request.
-- **Improve content or tests** — quiz quality, question coverage, or test coverage are always welcome.
+- **Fix a bug or add a feature** :  fork the repo, make a focused change, and open a pull request.
+- **Improve content or tests** :  quiz quality, question coverage, or test coverage are always welcome.
 
 ## Before you start
 
 - Check existing [issues](../../issues) for something similar before opening a new one.
 - For behavior changes, describe **why** and **how** so reviewers can understand the intent.
-- Keep changes **focused and small** — a PR that mixes unrelated changes is hard to review.
+- Keep changes **focused and small** :  a PR that mixes unrelated changes is hard to review.
 
 ## Getting started (local development)
 
@@ -40,7 +40,7 @@ This starts Postgres, the FastAPI backend (`:8000`, docs at `/docs`), and the fr
 ### Running the frontend directly
 
 1. From `frontend-react/`: `npm install`.
-2. `npm run dev` — the Vite dev server proxies `/api` to `http://127.0.0.1:8000`, so no CORS
+2. `npm run dev` :  the Vite dev server proxies `/api` to `http://127.0.0.1:8000`, so no CORS
    setup is needed.
 
 ## Code quality gates
@@ -68,7 +68,7 @@ Pull requests are verified by CI, and these checks must pass locally:
 5. A maintainer reviews your PR. Keep the change rebased/squashed as needed during review.
 
 > Note: the production stack is Vercel (frontend), Render (API), and Neon (Postgres).
-> You don't need any of that for local development — Docker + npm is all you need.
+> You don't need any of that for local development :  Docker + npm is all you need.
 
 ## Code of conduct
 

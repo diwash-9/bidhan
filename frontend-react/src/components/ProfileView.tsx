@@ -32,7 +32,7 @@ export default function ProfileView() {
           <div className="min-w-0">
             <h2 className="text-2xl font-bold font-display truncate">{progress.display_name}</h2>
             <p className="text-sm text-slate-400">
-              {progress.longest_streak > 0 ? `Best streak: ${progress.longest_streak} day${progress.longest_streak === 1 ? '' : 's'}` : 'Your विधान Bidhan journey starts here'}
+              {progress.longest_streak > 0 ? `Best streak: ${progress.longest_streak} day${progress.longest_streak === 1 ? '' : 's'}` : 'Your विधान Bidhan progress starts here'}
             </p>
           </div>
         </div>

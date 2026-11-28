@@ -2,7 +2,7 @@
 
 Share your locally-running Bidhan app over the internet using **Cloudflare Quick Tunnel**
 (`trycloudflare.com`). No Cloudflare or GitHub account required. Your friend only needs the
-URL — nothing to install or configure.
+URL :  nothing to install or configure.
 
 ## Current session URL
 
@@ -11,7 +11,7 @@ https://flows-selective-streaming-animals.trycloudflare.com
 ```
 
 > This URL is random and only lives as long as the tunnel process runs. If you restart the
-> tunnel you get a new URL — update the link you send.
+> tunnel you get a new URL :  update the link you send.
 
 ## How it works
 
@@ -38,7 +38,7 @@ Wait until the frontend is reachable, then sanity-check:
 `cloudflared` is installed at `C:\Program Files (x86)\cloudflared\cloudflared.exe`
 (installed via `winget install Cloudflare.cloudflared`).
 
-Run it in the foreground (easiest — keeps a visible window, prints the URL):
+Run it in the foreground (easiest :  keeps a visible window, prints the URL):
 
 ```powershell
 & "C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://localhost:5173

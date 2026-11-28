@@ -15,14 +15,14 @@ Reading the Constitution no longer requires an account, and the reader is now an
 - **Reader details**: estimated reading time in the header and a two-step "Reset progress" control that clears only this article's local clause ticks and finished marker.
 
 ### Changed
-- **Auth landing page**: two clear paths instead of a small reading link — a prominent "Start reading free" card (every article unlocked, read aloud, bookmarks) and a tabbed Log in / Create account card, plus a "Continue without an account" option and a compact benefits strip. Reading is the first path on mobile too.
+- **Auth landing page**: two clear paths instead of a small reading link :  a prominent "Start reading free" card (every article unlocked, read aloud, bookmarks) and a tabbed Log in / Create account card, plus a "Continue without an account" option and a compact benefits strip. Reading is the first path on mobile too.
 
 ### Fixed
 - **Read-aloud reliability**: pick an available English voice, defer speaking after `cancel()` to avoid Chrome dropping queued utterances, and show a clear message when audio is blocked or the browser has no speech voices.
 - **Read-aloud fallback**: if the browser engine reports `synthesis-failed` or never starts (common on Linux/Chromium without installed voices), playback automatically retries with an online spoken-audio voice; the toolbar shows whether the device or online voice is in use.
 - **Audio autoplay block**: media playback is primed inside the Listen click, the online voice is used directly when no browser voices exist, and a "Try online voice" button retries from a fresh click if a browser still blocks audio. Verified in Chromium with its default user-gesture autoplay policy.
-- **Study navigation**: the logo no longer loops back to the library for guests — it leads to the public landing page. Study mode now also has an explicit Home link in the header (desktop and mobile) and a back link on the library page.
-- **Public home page**: new landing page at `/` with two clear entry points — "Start reading free" (Study mode, no account) and "Sign in to play" (Guided path with lessons, quizzes, streaks). The old auth page is now a clean login/register screen at `/auth`. Logo and navigation consistently point to `/` for both guests and signed-in users.
+- **Study navigation**: the logo no longer loops back to the library for guests :  it leads to the public landing page. Study mode now also has an explicit Home link in the header (desktop and mobile) and a back link on the library page.
+- **Public home page**: new landing page at `/` with two clear entry points :  "Start reading free" (Study mode, no account) and "Sign in to play" (Guided path with lessons, quizzes, streaks). The old auth page is now a clean login/register screen at `/auth`. Logo and navigation consistently point to `/` for both guests and signed-in users.
 
 ### Notes
 - Clause progress, bookmarks, and text size are stored in `localStorage` on the reader's device. No backend, database, or game-progress changes.
@@ -33,12 +33,12 @@ Reading the Constitution no longer requires an account, and the reader is now an
 ### Verified
 - Frontend `typecheck`, `lint`, `build` clean.
 
-## [Unreleased]: Study mode — read any article
+## [Unreleased]: Study mode :  read any article
 
 A read-only way to explore the Constitution without touching game progress.
 
 ### Added
-- **Study tab** (`/read`): browsable library of all 308 articles across 35 parts, with text search and a part filter. Every article is open — no unlocks, no lock icons.
+- **Study tab** (`/read`): browsable library of all 308 articles across 35 parts, with text search and a part filter. Every article is open :  no unlocks, no lock icons.
 - **Article reader** (`/read/:articleId`): comfortable, clause-by-clause reading view with sub-clauses and previous/next article navigation.
 - Game stats (hearts, streak, XP) are hidden on Study routes; quiz, completion, and heart APIs are never called from Study mode.
 
@@ -59,7 +59,7 @@ game rules untouched).
 - **Lesson view**: question progress bar, icon-based correct/wrong answer states
   (no more strike-through or text-symbol hearts), icon buttons, emoji-free copy.
 - **Profile**: avatar initial, best-streak line, weekly-quest bar, constitution
-  progress with unlocked-lesson hint — all from the existing summary payload.
+  progress with unlocked-lesson hint :  all from the existing summary payload.
 - **Leaderboard**: branded header, icon empty state, consistent card styling.
 - **Path & header**: calmer stat pills, refined weekly-quest card.
 - **Admin**: icon action button.
@@ -69,7 +69,7 @@ game rules untouched).
 ### Verified
 - `npm run typecheck`, `npm run lint`, `npm run build` clean.
 
-## [Unreleased]: Hearts rework — enforced 0-heart block, 25 cap, 3-min refills
+## [Unreleased]: Hearts rework :  enforced 0-heart block, 25 cap, 3-min refills
 
 Playing with 0 hearts was still possible: quiz attempts were blocked server-side,
 but finishing a lesson (and unlocking the next one) had no hearts gate, and the
@@ -94,7 +94,7 @@ refills in 3 minutes.
   `ruff` clean. Refill-timer tests rewritten for the 3-min interval / 25 cap.
 - Frontend: `typecheck`, `lint`, `build` clean.
 
-## [Unreleased]: Performance — first-login and per-lesson stalls fixed
+## [Unreleased]: Performance :  first-login and per-lesson stalls fixed
 
 First chapter unlock took 15-20s on first login and every lesson/reload stalled
 ~15s on production (Render free + Neon latency). Root causes: 308 individual

@@ -4,7 +4,7 @@
 
 **An interactive, gamified learning platform for the Constitution of Nepal**
 
-Duolingo-style lessons built around all **308 articles** across **35 parts** — read structured
+Duolingo-style lessons built around all **308 articles** across **35 parts** :  read structured
 lessons (articles → clauses → sub-clauses), unlock a branching learning path, and prove your
 knowledge with 1,200+ graded quiz questions.
 
@@ -27,7 +27,7 @@ knowledge with 1,200+ graded quiz questions.
 
 Bidhan makes Nepal's constitution approachable through the mechanics of a language-learning
 game: follow a **branching unlock path**, complete two-phase lessons (**read → knowledge
-check**), climb global and weekly leaderboards, and maintain a streak — while the content
+check**), climb global and weekly leaderboards, and maintain a streak :  while the content
 remains a faithful rendering of the official 2015 English translation. Visitors who just
 want to read can open every article at `/read` without creating an account; game features
 stay login-gated.
@@ -42,31 +42,31 @@ The project is split into a React SPA and a FastAPI backend with a PostgreSQL da
 
 ## Features
 
-- **Complete constitution content** — all 308 articles parsed into parts, articles, clauses,
+- **Complete constitution content** :  all 308 articles parsed into parts, articles, clauses,
   and sub-clauses, organized into a 328-edge dependency graph.
-- **Branching learning path** — articles unlock along a dependency graph (not a linear line).
-- **Two-phase lessons** — read the article, then face a hidden-article knowledge check; the
+- **Branching learning path** :  articles unlock along a dependency graph (not a linear line).
+- **Two-phase lessons** :  read the article, then face a hidden-article knowledge check; the
   article is only accessible mid-quiz at the cost of a heart.
-- **Graded quizzes** — 1,200+ question bank (article subject, clause text, quote matching,
+- **Graded quizzes** :  1,200+ question bank (article subject, clause text, quote matching,
   real-life scenario questions) with explanations and difficulty levels.
-- **Hearts that mean something** — 25 hearts, +1 refill every 3 minutes with a live
+- **Hearts that mean something** :  25 hearts, +1 refill every 3 minutes with a live
   countdown. At 0 hearts the quiz, lesson start, lesson finish, and article reveals are
   all hard-blocked (server-enforced 403s + blocking UI) until a refill lands.
-- **Gamification** — XP (+5/answer, +15/lesson, +4/practice), streaks, leagues, sound, and
+- **Gamification** :  XP (+5/answer, +15/lesson, +4/practice), streaks, leagues, sound, and
   celebrations.
-- **Practice mode** — replay any completed lesson for reduced XP with zero heart cost.
-- **Study mode (no sign-in needed)** — browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP — game progress is untouched.
-- **Weekly quest & leaderboard** — a 100 XP weekly goal with a live progress bar, plus
+- **Practice mode** :  replay any completed lesson for reduced XP with zero heart cost.
+- **Study mode (no sign-in needed)** :  browse all 308 articles in a searchable, read-only library and read interactively: tick off clauses, jump between them, listen aloud (browser voice with online fallback), resize text, bookmark articles, and copy deep links. No unlocks, quizzes, hearts, or XP :  game progress is untouched.
+- **Weekly quest & leaderboard** :  a 100 XP weekly goal with a live progress bar, plus
   weekly-first and all-time rankings.
-- **User accounts** — secure signup/login with JWT access + refresh tokens and per-user progress; the landing page leads with a prominent no-sign-in reading option for visitors who just want to explore.
-- **Instant search** — full-text search across article titles and content.
-- **Content administration** — role-gated admin panel for articles, clauses, dependencies, and
+- **User accounts** :  secure signup/login with JWT access + refresh tokens and per-user progress; the landing page leads with a prominent no-sign-in reading option for visitors who just want to explore.
+- **Instant search** :  full-text search across article titles and content.
+- **Content administration** :  role-gated admin panel for articles, clauses, dependencies, and
   quiz questions, with an audited amendment trail.
-- **Fast on free-tier hosting** — bulk progress materialization, bulk unlocks, N+1-free
+- **Fast on free-tier hosting** :  bulk progress materialization, bulk unlocks, N+1-free
   article loads, part-scoped progress fetching, and a sub-KB progress-summary endpoint keep
   first login and every lesson load snappy even on high-latency databases.
 
-## Public home page — two ways in
+## Public home page :  two ways in
 
 The landing page at `/` presents two clear paths:
 
@@ -78,21 +78,21 @@ The landing page at `/` presents two clear paths:
 The old auth page is now a clean login/register screen at `/auth`. The logo and navigation
 consistently point to `/` for both guests and signed-in users.
 
-- **Library** — search by article number, title, or part; filter by part; focus the list on
+- **Library** :  search by article number, title, or part; filter by part; focus the list on
   All / Saved / Finished articles with live counts. **Surprise me** opens a random one, and
   Continue reading / Saved for later / Finished articles use your device-local history.
-- **Reader** — tick clauses off as you go, watch the progress bar, jump to a clause, resize
+- **Reader** :  tick clauses off as you go, watch the progress bar, jump to a clause, resize
   text, bookmark the article, copy deep links to it or a clause, follow related-article
   links, flip between articles with ← / →, see an estimated reading time, and reset this
   article's local progress with a two-step confirmation.
-- **Read aloud** — prefers a voice installed on the device. If the browser has no working
+- **Read aloud** :  prefers a voice installed on the device. If the browser has no working
   voices or blocks playback, it falls back to an online voice; a **Try online voice** button
   retries from a fresh click. The online voice sends the article text to Google Translate's
   public TTS endpoint, so it requires an internet connection.
-- **Local only** — clause ticks, bookmarks, finished articles, text size, and the last-read
+- **Local only** :  clause ticks, bookmarks, finished articles, text size, and the last-read
   article live in this browser's `localStorage`. There is no account and no server-side
   reading state.
-- **No game impact** — Study mode never calls quiz, completion, or heart APIs and never
+- **No game impact** :  Study mode never calls quiz, completion, or heart APIs and never
   changes unlocks, XP, streaks, or hearts.
 
 These routes use the public content endpoints `GET /api/articles` and
@@ -115,7 +115,7 @@ These routes use the public content endpoints `GET /api/articles` and
 - Docker + Docker Compose (easiest), **or**
 - Python 3.11 + Node 22 with a local PostgreSQL 16/17 for manual setup.
 
-### Option A — Docker (recommended)
+### Option A :  Docker (recommended)
 
 ```bash
 docker compose up --build -d
@@ -123,7 +123,7 @@ docker compose up --build -d
 # API docs: http://localhost:8000/docs
 ```
 
-### Option B — Manual
+### Option B :  Manual
 
 ```bash
 # 1. Database (PostgreSQL, database `constitution`)
@@ -147,7 +147,7 @@ npm run dev                    # http://localhost:5173
 
 ### Configuration
 
-Copy the template and adjust — never commit real secrets:
+Copy the template and adjust :  never commit real secrets:
 
 ```bash
 cp .env.example backend/.env
@@ -225,7 +225,7 @@ render.yaml       Render blueprint (API + database wiring)
 
 ## Contributing
 
-Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup,
+Contributions are welcome :  see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup,
 code-quality gates, and the pull request process. To report a security issue, follow our
 [security policy](SECURITY.md) and use a private GitHub advisory. Notable changes are
 recorded in [CHANGELOG.md](CHANGELOG.md).

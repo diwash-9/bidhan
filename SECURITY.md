@@ -31,14 +31,14 @@ Things covered by this policy:
 Out of scope:
 
 - Resource exhaustion of the free-tier hosting (cold starts, instance-hour limits).
-- Issues in upstream dependencies — report those to the respective projects.
+- Issues in upstream dependencies :  report those to the respective projects.
 
 ## Security measures in place
 
-- **Passwords** are hashed with bcrypt — never stored in plain text.
+- **Passwords** are hashed with bcrypt :  never stored in plain text.
 - **Authentication** uses JWT (HS256) with separate access and refresh tokens; the signing
   secret is injected via the `JWT_SECRET` environment variable.
-- **CORS** is an explicit allow-list loaded from `CORS_ORIGINS` — never a wildcard.
+- **CORS** is an explicit allow-list loaded from `CORS_ORIGINS` :  never a wildcard.
 - **Rate limiting** is applied per-IP to the API to mitigate abuse.
 - **Secrets** are never committed: `.env` files are gitignored, only `.env.example` is tracked.
 - **Dependencies** are pinned (`requirements*.txt`, `package-lock.json`) and CI runs the full
